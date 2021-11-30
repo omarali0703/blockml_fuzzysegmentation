@@ -10,11 +10,11 @@ from nltk.stem import PorterStemmer
 # from nltk.corpus import wordnet_ic
 import io, json, sys
 import os
-os.environ['CLASSPATH'] = "jars/*"
+os.environ['CLASSPATH'] = "../../dependencies/jars/*"
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, 'Visualiser/')
+filename = os.path.join(dirname, '../visualiser/')
 
-import syntax_parser
+import block_syntax_parser.block_syntax_parser as syntax_parser
 import ss2fb
 
 lemmatizer = WordNetLemmatizer() 
@@ -32,7 +32,7 @@ example_2 = 'This is just a test. Although it does not really matter'
 # leaves, tree = syntax_parser.generate_parse_tree(example_2)
 
 PAD_CHAR = ('NULL', '')
-f = open(filename + "example_out.json", "w")
+f = open(filename + "fuzzy_seg_tilling_output.json", "w")
 
 current_inti_set = []
 current_intj_set = []

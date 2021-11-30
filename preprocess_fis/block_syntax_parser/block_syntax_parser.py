@@ -34,7 +34,7 @@ def generate_parse_tree(input_str, show=True, parse_type='syntax'):
     if parse_type == 'syntax':
         sentences = parser.parse_one(input_str.split())
     elif parse_type == 'dep':
-        spacy_dep_tree = 
+        spacy_dep_tree = None
 
         config = {
             "moves": None,
