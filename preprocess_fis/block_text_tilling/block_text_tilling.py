@@ -1,5 +1,4 @@
 
-import ..validators as validator
 import matlab.engine
 # from nltk import pos_tag, word_tokenize
 # from nltk.wsd import lesk
@@ -14,8 +13,10 @@ os.environ['CLASSPATH'] = "../../dependencies/jars/*"
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, '../visualiser/')
 
-import block_syntax_parser.block_syntax_parser as syntax_parser
+from ..block_syntax_parser import block_syntax_parser as syntax_parser
 import ss2fb
+import validators as validators
+
 
 lemmatizer = WordNetLemmatizer() 
 stemmer = PorterStemmer()
