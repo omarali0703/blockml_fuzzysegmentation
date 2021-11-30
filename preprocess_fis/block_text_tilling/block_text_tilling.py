@@ -86,11 +86,6 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True): # j is the window fo
     # print(string_arr)
   
     for tree in tree_list:
-        
-        # Get the boundaries from the test data.
-        # if not get_boundary:
-        #     test_data_boundaries = ss2fb.convert_slseg_2_fb(tree)
-        # ----
         for i in range(len(string_arr) + 1):
             left_splice = i - k
             right_splice = i + k
