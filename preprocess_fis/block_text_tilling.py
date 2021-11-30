@@ -13,10 +13,9 @@ os.environ['CLASSPATH'] = "../../dependencies/jars/*"
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, '../visualiser/')
 
-from ..block_syntax_parser import block_syntax_parser as syntax_parser
-import ss2fb
-import validators as validators
-
+# import syntax_parser
+from . import validators as validator
+from . import block_syntax_parser as syntax_parser
 
 lemmatizer = WordNetLemmatizer() 
 stemmer = PorterStemmer()

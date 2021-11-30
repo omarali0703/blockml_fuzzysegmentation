@@ -22,8 +22,9 @@ def compare_leaves(sentence, leaf_1, leaf_2):
 
 #  Only load this shit once
 model_dir = find('models/bllip_wsj_no_aux').path
-parser = bllip.BllipParser.from_unified_model_dir(model_dir)   
-
+print (model_dir)
+parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser  
+# STANFord parser?? 
 def generate_parse_tree(input_str, show=True, parse_type='syntax'):
     # STANFORD PARSER
     # parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar', path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar')
@@ -32,7 +33,8 @@ def generate_parse_tree(input_str, show=True, parse_type='syntax'):
     # CHARNIAK
     # print(input_str)
     if parse_type == 'syntax':
-        sentences = parser.parse_one(input_str.split())
+        print(input_str)
+        sentences = parser.parse_all(input_str.split())
     elif parse_type == 'dep':
         spacy_dep_tree = None
 

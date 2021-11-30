@@ -1,5 +1,5 @@
 import sys
-import results2csv
+# import results2csv
 # take an input segmentation, and a ground truth segmentation to validate.
 def window_diff(true_segmentation, proposed_segmentation, k, boundary="1"):
     

@@ -1,5 +1,5 @@
 import re
-import block_text_tilling as tt
+from . import block_text_tilling as tt
 import os
 from nltk.tokenize import word_tokenize
 
