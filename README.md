@@ -1,4 +1,4 @@
-# mlflow example project structure
+# MLFlow Example Project Structure
 1. each folder defines a particular block the interface will run through
     2. each block can contain sub-blocks, modules etc that will run in the order of your choosing -> Defined in the **__init__** file of the respective block.
     
@@ -8,11 +8,11 @@
 ## Example commands I use
 
 ### Example of running syntax-parse training for fuzzy system
-```
+```bash
 python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset_inputs syntax
 ```
 
 ### Example of running dependency-parse training for fuzzy system
-```
+```bash
 python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset_inputs dependency
 ```

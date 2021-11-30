@@ -8,12 +8,13 @@ OUTPUT_FLOW = None
 def start(input_data=None, settings={}):
     # list_path = os.listdir(dataset_path)
     output_data, loop_breaker = {}, None
+    print("fuuuuuu", settings)
+    input_data_keys = list(input_data.keys())
     if settings == 'syntax':
-        for sub_path in input_data:
-            file = open(f"{dataset_path}/{sub_path}", "r")
-            file_data = file.read()
-            file.close()
-            print(file_data, type(file_data))
+        for sub_path in input_data_keys:
+            print(sub_path)
+            file_data = input_data[sub_path]
+            print(file_data, sub_path)
             boundary_objects, raw_bounds, raw_text = block_text_tilling.ss2fb.obtain_boundary_objects(None, file_data, None, slseg=True, k=3, get_boundary=False)
             print(raw_bounds)
 

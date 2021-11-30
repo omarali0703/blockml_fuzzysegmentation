@@ -1,5 +1,5 @@
 
-import validators as validator
+import ..validators as validator
 import matlab.engine
 # from nltk import pos_tag, word_tokenize
 # from nltk.wsd import lesk
