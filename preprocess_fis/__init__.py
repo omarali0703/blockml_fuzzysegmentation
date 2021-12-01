@@ -1,5 +1,6 @@
 import json, os
 from . import ss2fb
+from . import block_slseg_wrapper
 INPUT_FLOW = None
 OUTPUT_FLOW = None
 
@@ -8,14 +9,14 @@ OUTPUT_FLOW = None
 def start(input_data=None, settings={}):
     # list_path = os.listdir(dataset_path)
     output_data, loop_breaker = {}, None
-    print("fuuuuuu", settings)
     input_data_keys = list(input_data.keys())
     if settings == 'syntax':
         for sub_path in input_data_keys:
             print(sub_path)
             file_data = input_data[sub_path]
+            slsegged_file_data, loop_breaker = block_slseg_wrapper.run_slseg(path_to_slseg_source='../dependencies/SLSeg_ver_0.2/)
             print(file_data, sub_path)
-            boundary_objects, raw_bounds, raw_text = ss2fb.obtain_boundary_objects(None, file_data, None, slseg=True, k=3, get_boundary=False)
+            boundary_objects, raw_bounds, raw_text = ss2fb.obtain_boundary_objects(None, slsegged_file_data, None, slseg=True, k=3, get_boundary=False)
             print(raw_bounds)
 
             # merged_output = f"{output_path}/classify_boundaries_{sub_path.split('.')[0]}.arff"

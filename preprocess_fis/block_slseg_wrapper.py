@@ -11,7 +11,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-def run_slseg(input_directory, output_directory=None, path_to_slseg_source):
+def run_slseg(path_to_slseg_source):
     path_to_slseg_source = os.path.join(path_to_slseg_source, 'run_all.py')
     test_samples = os.path.join(path_to_slseg_source, 'test_samples')
     output_test = os.path.join(path_to_slseg_source, 'output_test')
@@ -19,6 +19,7 @@ def run_slseg(input_directory, output_directory=None, path_to_slseg_source):
     print(f'{bcolors.OKGREEN}Starting SLSeg...')
     try:
         os.system(f'python3 {path_to_slseg_source} {test_samples} {output_test} {parser05Aug16} -T50')
+        return os.path.join(output_test, 'step6_discoursed'), None
     except error:
         print(f'{bcolors.FAIL}{error})
         
