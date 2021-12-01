@@ -25,6 +25,7 @@ segEx = '''<T>
 
 # test
 
+
 def new_convert_slseg_2_fb(slseg, indexed_list=False):
     slseg = re.sub(r'-', '', slseg)
     slseg = re.sub(r'["]*', '', slseg)
@@ -53,7 +54,7 @@ def new_convert_slseg_2_fb(slseg, indexed_list=False):
                 segmentation += '1'
             else:
                 segmentation += '0'
-            
+
             sentence_length_index += 1
     print("SLSEG", my_words)
     return segmentation
@@ -64,7 +65,7 @@ def convert_slseg_2_fb(slseg, indexed_list=False):
     slseg = re.sub(r'[/]*[a-zA-Z0-9]', '', slseg)
 
     slseg = re.sub(r'[a-zA-Z0-9!@£$%^&*.,]*/[A-Z0-9&$£!@.,]* ', '0', slseg)
-    
+
     print('first pass', slseg)
     slseg = re.sub(r'[/]*[,.?:;]', '', slseg)
     print('second pass', slseg)
@@ -75,7 +76,7 @@ def convert_slseg_2_fb(slseg, indexed_list=False):
     slseg = re.sub(r' ', '', slseg)
     slseg = re.sub(r'Â', '', slseg)
     slseg = re.sub(r'-LRB-', '', slseg)
-    slseg = re.sub(r'-RRB-', '', slseg) # This may cause an issue.
+    slseg = re.sub(r'-RRB-', '', slseg)  # This may cause an issue.
     slseg = re.sub(r'``', '', slseg)
     slseg = re.sub(r'/', '', slseg)
     slseg = re.sub(r'\'', '', slseg)
@@ -93,25 +94,21 @@ def convert_slseg_2_fb(slseg, indexed_list=False):
 
     return slseg
 
-# print(convert_slseg_2_fb(segEx))
 
-#Converting segbot's output to a binary format for the validators.
-def convert_segbot_2_bin(segbot_input): 
+# Converting segbot's output to a binary format for the validators.
+def convert_segbot_2_bin(segbot_input):
     segmentation = '1'
     segbot_input = segbot_input.replace(r'-', '')
     segbot_input = segbot_input.replace(r'``', '')
     segbot_input = segbot_input.replace(r'\'', '')
     # segbot_input = re.sub(r'[a-zA-Z0-9!@£$%^&*.,`]+', '', segbot_input)
-
     # segbot_input = re.sub(r'[`]+', 'FUCK', segbot_input)
     segbot_input = segbot_input.split('\n')
-
     word_count = 0
     my_words = ''
     for sentence in segbot_input:
         if sentence == '':
             continue
-
         parsed_sentence = word_tokenize(sentence)
         sentence_length = len(parsed_sentence)
         sentence_length_index = 1
@@ -124,14 +121,13 @@ def convert_segbot_2_bin(segbot_input):
                 segmentation += '1'
             else:
                 segmentation += '0'
-            
             sentence_length_index += 1
     print("SEGBOT", my_words)
     return segmentation
 
+
 def obtain_boundary_objects(fis, text, segs, slseg=False, k=3, get_boundary=False):
     temp_seg_ex = text
-
     if (slseg):
         text = re.sub(r'/[.,?\'"`A-Z]*', '', text)
         text = re.sub(r' [.]', '.', text)
@@ -142,19 +138,15 @@ def obtain_boundary_objects(fis, text, segs, slseg=False, k=3, get_boundary=Fals
         text = re.sub(r'(<[/]*[A-Z]*>)', '', text)
         text = re.sub(r'\n', '', text)
     # print(text)
-
     # tree, processed_leaves = tt.split(text, show=False)
     tree_list, processed_leaves = tt.split(text, show=False)
     # print(tree_list)
     # We then need to use the split function (text_tilling version) on 'text' instead of .split() and tile using that instead.
-    
-    boundary_raw, indexed_list = convert_slseg_2_fb(temp_seg_ex, indexed_list=True)
-    
+    boundary_raw = new_convert_slseg_2_fb(temp_seg_ex, indexed_list=True)
     # boundary_objects = tt.tile(tree, processed_leaves, k, get_boundary=False, )
-    
     # TODO HERE IS WHERE THE ISSUE IS WITH THE 343 instances as opposed to 49/50
     boundary_objects = tt.tile(fis,
-        tree_list, processed_leaves, k, get_boundary=get_boundary, )
+                               tree_list, processed_leaves, k, get_boundary=get_boundary, )
     print(len(boundary_objects))
     for b in boundary_objects:
         b = b[:1]+(b, )+b[1:]
@@ -162,26 +154,25 @@ def obtain_boundary_objects(fis, text, segs, slseg=False, k=3, get_boundary=Fals
     return boundary_objects, boundary_raw, text
 
 
-
 def write_as_dat(variables, data, file, included_bounds=None):
     f = open(file, "w")
 
     parsed_variables = ''
     parsed_data = '['
-    included_bounds_index=0
+    included_bounds_index = 0
     bound_object_to_write = 'NULL'
     print('FIRST CHECK LEN ', len(included_bounds))
     print('LEN CHECK 1A ', data, len(data))
 
     for data_point in data:
         if included_bounds:
-            bound_object_to_write=included_bounds[included_bounds_index]
-            
+            bound_object_to_write = included_bounds[included_bounds_index]
+
         parsed_data += f'{bound_object_to_write},{data_point[1]},{data_point[2]},{data_point[3]}\n'
         print('SEC CHECK LEN ', included_bounds_index)
-    
-        included_bounds_index+=1
-    
+
+        included_bounds_index += 1
+
     parsed_data += ']'
     f.write(parsed_data)
     f.close()
