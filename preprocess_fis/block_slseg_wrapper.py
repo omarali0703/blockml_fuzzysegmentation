@@ -21,5 +21,5 @@ def run_slseg(path_to_slseg_source):
         os.system(f'python3 {path_to_slseg_source} {test_samples} {output_test} {parser05Aug16} -T50')
         return os.path.join(output_test, 'step6_discoursed'), None
     except error:
-        print(f'{bcolors.FAIL}{error})
+        print(f'{bcolors.FAIL}{error}')
         
