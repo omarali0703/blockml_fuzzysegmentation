@@ -1,11 +1,11 @@
 import io
-from os import write, path
+from os import write, path, listdir
 import xml.etree.ElementTree as ET
 
 # Retrieve the segmentations from the RST file.
 # if Bin, return the FuzzySeg version (binary), otherwise return a parsed list
 # Output_location is not including the file name itself. This is taken from the location.
-# The location variable includes the file name we are parsing. I do not 
+# The location variable includes the file name we are parsing. 
 def parse_rs3(location, output_location=None, bin=True):
     rst = ET.parse(location)
     root = rst.getroot()
@@ -22,11 +22,9 @@ def parse_rs3(location, output_location=None, bin=True):
                 segement_text = segment_tag.text
                 if not bin:
                     segments.append(segement_text)
-                else:
-                    if segement_text:
-                        segments += '0'*len(segement_text.split(' '))
-                        segments += '1'
-
+                elif segement_text:
+                    segments += '0'*len(segement_text.split(' '))
+                    segments += '1'
         elif child_tag == 'head':
             # TODO Parse the RST structure here?
             # TODO RST Main structure is stored here. Links and deps are determined here.
@@ -34,8 +32,6 @@ def parse_rs3(location, output_location=None, bin=True):
     if output_location:
         output_location = open(output_location, 'w')
         file_name = len(location.split('/'))
-
-
     return segments
 
 # Write_to_file is the location of the folder.
@@ -47,17 +43,18 @@ def get_original_text(location=None, write_to_file=None):
     filename = location.split('/')
     filename = filename[len(filename)-1]
     filename = filename.split('.')[0]
-
+    filename += '_conv_to_raw_text.txt'
     original_text = ''
     for child in root:
         child_tag = child.tag
         child_attr = child.attrib
-        if child_tag == 'body':
-            # parse the segments in this section
-            for segment_tag in child:
-                segement_text = segment_tag.text
-                if segement_text != None:
-                    original_text += segement_text
+        if child_tag != 'body':
+            continue
+        # parse the segments in this section
+        for segment_tag in child:
+            segement_text = segment_tag.text
+            if segement_text != None:
+                original_text += segement_text
 
     if write_to_file:
         write_to_file = os.path.join(write_to_file, filename)
@@ -67,8 +64,22 @@ def get_original_text(location=None, write_to_file=None):
         return write_to_file # Return the location
     return original_text
 
-# test_text = get_original_text('../dependencies/phd_datasets/gum_dataset/rst/rstweb/GUM_academic_mutation.rs3')
-test_text = parse_rs3('../dependencies/phd_datasets/gum_dataset/rst/rstweb/GUM_academic_mutation.rs3')
+
+rst_directory = '../dependencies/phd_datasets/gum_dataset/rst/rstweb/'
+output_location_raw = '../dependencies/phd_datasets/gum_outputs/original_gum_text/'
+output_location_bin = '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
+list_path = os.listdir(rst_directory)
+total_files = 5
+file_counter = 1
+for file in list_path:
+    if file_counter >= total_files:
+        continue
+    destination = os.path.join(file, list_path)
+    rst_text = parse_rs3(destination, output_location_bin)
+    raw_text = get_original_text(destination, output_location_bin)
+
+    file_counter += 1
+
 print(test_text)
 
 def get_deps(location=None, rst_data=None):
