@@ -30,8 +30,17 @@ def parse_rs3(location, output_location=None, bin=True):
             # TODO RST Main structure is stored here. Links and deps are determined here.
             pass
     if output_location:
+        print('saving segments...')
+        file_name = location.split('/')
+        print(file_name)
+        file_name = file_name[len(file_name)-1]
+        output_location = path.join(output_location, file_name)
         output_location = open(output_location, 'w')
-        file_name = len(location.split('/'))
+        output_location.write(segments)
+        output_location.close()
+
+        print(f'segments saved {file_name}')
+
     return segments
 
 # Write_to_file is the location of the folder.
@@ -57,7 +66,7 @@ def get_original_text(location=None, write_to_file=None):
                 original_text += segement_text
 
     if write_to_file:
-        write_to_file = os.path.join(write_to_file, filename)
+        write_to_file = path.join(write_to_file, filename)
         output_file = open(write_to_file, 'w')
         output_file.write(original_text)
         output_file.close()
@@ -68,19 +77,19 @@ def get_original_text(location=None, write_to_file=None):
 rst_directory = '../dependencies/phd_datasets/gum_dataset/rst/rstweb/'
 output_location_raw = '../dependencies/phd_datasets/gum_outputs/original_gum_text/'
 output_location_bin = '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
-list_path = os.listdir(rst_directory)
+list_path = listdir(rst_directory)
 total_files = 5
 file_counter = 1
 for file in list_path:
     if file_counter >= total_files:
         continue
-    destination = os.path.join(file, list_path)
+    destination = path.join(rst_directory, file)
     rst_text = parse_rs3(destination, output_location_bin)
-    raw_text = get_original_text(destination, output_location_bin)
+    raw_text = get_original_text(destination, output_location_raw)
 
     file_counter += 1
 
-print(test_text)
+# print(test_text)
 
 def get_deps(location=None, rst_data=None):
     if location and not rst_data:
