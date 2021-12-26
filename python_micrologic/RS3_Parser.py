@@ -52,7 +52,7 @@ def get_original_text(location=None, write_to_file=None):
     filename = location.split('/')
     filename = filename[len(filename)-1]
     filename = filename.split('.')[0]
-    filename += '_conv_to_raw_text.txt'
+    filename += '_raw_text.txt'
     original_text = ''
     for child in root:
         child_tag = child.tag
@@ -65,6 +65,14 @@ def get_original_text(location=None, write_to_file=None):
             if segement_text != None:
                 original_text += segement_text
 
+    original_text = original_text.replace(' .', '. ')
+    original_text = original_text.replace(' , ', ', ')
+    original_text = original_text.replace(' ,', ', ')
+    original_text = original_text.replace(' :', ': ')
+    original_text = original_text.replace(' \ ', ' ')
+    original_text = original_text.replace(' ’s', '’s')
+    original_text = original_text.replace(' ’', '’')
+
     if write_to_file:
         write_to_file = path.join(write_to_file, filename)
         output_file = open(write_to_file, 'w')
@@ -74,6 +82,7 @@ def get_original_text(location=None, write_to_file=None):
     return original_text
 
 
+# This code parses the GUM RST bits and produces the raw versions (To be segmented by SLSeg and SEGBot?) and produces the BIN outs from the already GUM-parsed text (taken from the GUM-RST outs)
 rst_directory = '../dependencies/phd_datasets/gum_dataset/rst/rstweb/'
 output_location_raw = '../dependencies/phd_datasets/gum_outputs/original_gum_text/'
 output_location_bin = '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
@@ -81,14 +90,14 @@ list_path = listdir(rst_directory)
 total_files = 5
 file_counter = 1
 for file in list_path:
-    if file_counter >= total_files:
+    if file_counter > total_files:
         continue
     destination = path.join(rst_directory, file)
     rst_text = parse_rs3(destination, output_location_bin)
     raw_text = get_original_text(destination, output_location_raw)
 
     file_counter += 1
-
+# END 
 # print(test_text)
 
 def get_deps(location=None, rst_data=None):
