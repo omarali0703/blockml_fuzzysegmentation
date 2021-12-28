@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 # The location variable includes the file name we are parsing.
 
 
-def parse_rs3(location, output_location=None, bin=True):
+def parse_rs3(location, bin=True, output_location=None):
     rst = ET.parse(location)
     root = rst.getroot()
     segments = []
