@@ -5,7 +5,9 @@ import xml.etree.ElementTree as ET
 # Retrieve the segmentations from the RST file.
 # if Bin, return the FuzzySeg version (binary), otherwise return a parsed list
 # Output_location is not including the file name itself. This is taken from the location.
-# The location variable includes the file name we are parsing. 
+# The location variable includes the file name we are parsing.
+
+
 def parse_rs3(location, output_location=None, bin=True):
     rst = ET.parse(location)
     root = rst.getroot()
@@ -23,7 +25,8 @@ def parse_rs3(location, output_location=None, bin=True):
                 if not bin:
                     segments.append(segement_text)
                 elif segement_text:
-                    segments += '0'*len(segement_text.split(' '))
+                    segments += '0'*(len(segement_text.split(' '))-1)
+                    # segments += '0'*len(segement_text.split(' '))
                     segments += '1'
         elif child_tag == 'head':
             # TODO Parse the RST structure here?
@@ -44,8 +47,10 @@ def parse_rs3(location, output_location=None, bin=True):
     return segments
 
 # Write_to_file is the location of the folder.
-# This should not include the filename at the end. 
+# This should not include the filename at the end.
 # This is generated using the location var.
+
+
 def get_original_text(location=None, write_to_file=None):
     rst = ET.parse(location)
     root = rst.getroot()
@@ -78,11 +83,12 @@ def get_original_text(location=None, write_to_file=None):
         output_file = open(write_to_file, 'w')
         output_file.write(original_text)
         output_file.close()
-        return write_to_file # Return the location
+        return write_to_file  # Return the location
     return original_text
 
 
-# This code parses the GUM RST bits and produces the raw versions (To be segmented by SLSeg and SEGBot?) and produces the BIN outs from the already GUM-parsed text (taken from the GUM-RST outs)
+# This code parses the GUM RST bits and produces the raw versions
+# (To be segmented by SLSeg and SEGBot?) and produces the BIN outs from the already GUM-parsed text (taken from the GUM-RST outs)
 rst_directory = '../dependencies/phd_datasets/gum_dataset/rst/rstweb/'
 output_location_raw = '../dependencies/phd_datasets/gum_outputs/original_gum_text/'
 output_location_bin = '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
@@ -97,8 +103,8 @@ for file in list_path:
     raw_text = get_original_text(destination, output_location_raw)
 
     file_counter += 1
-# END 
-# print(test_text)
+# --------------------- END
+
 
 def get_deps(location=None, rst_data=None):
     if location and not rst_data:
