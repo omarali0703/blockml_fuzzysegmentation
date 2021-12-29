@@ -11,10 +11,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-def run_slseg(path_to_slseg_source):
+def run_slseg(path_to_slseg_source, test_samples='../dependencies/SLSeg_ver_0.2/test_samples', output_test='../dependencies/SLSeg_ver_0.2/output_test'):
     path_to_slseg_source = os.path.join(path_to_slseg_source, 'run_all.py')
-    test_samples = os.path.join(path_to_slseg_source, 'test_samples')
-    output_test = os.path.join(path_to_slseg_source, 'output_test')
     parser05Aug16 = os.path.join(path_to_slseg_source, 'parser05Aug16')
     print(f'{bcolors.OKGREEN}Starting SLSeg...')
     try:

@@ -16,3 +16,13 @@ python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset
 ```bash
 python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset_inputs dependency
 ```
+
+### Running SLSeg
+```bash
+python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50
+```
+
+### Running SLSeg & Segbot with Settings (Using the preprocess block) (GUM Dataset)
+```bash
+python3 mlflow.py run fuzzy_segmentation preprocess_fis 'phd_datasets/gum_outputs/original_gum_text' '{"type":"syntax", "is_dir":"True", "slseg_output":"phd_datasets/slseg_outputs/gum", "segbot_output_path":"phd_datasets/segbot_outputs/gum"}'
+```

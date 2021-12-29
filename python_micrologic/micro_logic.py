@@ -40,6 +40,7 @@ try:
             abs_location = os.path.join(location, segfile)
             if os.path.isdir(abs_location):
                 continue
+            print('begin rs3 parsing')
             rs3parser.parse_rs3(abs_location, *variables)
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")

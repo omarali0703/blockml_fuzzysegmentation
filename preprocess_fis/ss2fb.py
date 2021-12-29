@@ -22,10 +22,7 @@ segEx = '''<T>
 </P>
 </T>
 '''
-
-# test
-
-
+# DEPRECIATED Use the Micro logic one instead, that one uses the XML Parser system instead.
 def new_convert_slseg_2_fb(slseg, indexed_list=False):
     slseg = re.sub(r'-', '', slseg)
     slseg = re.sub(r'["]*', '', slseg)
