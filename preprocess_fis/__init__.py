@@ -22,11 +22,12 @@ def start(input_data, settings):
             #     file_data = open(os.path.join(input_data, sub_path), 'r')
             # else:
             #     file_data = input_data[sub_path]
-            slsegged_file_data, loop_breaker = block_slseg_wrapper.run_slseg(
-                path_to_slseg_source=os.path.join(settings['root'], 'SLSeg_ver_0.2'), test_samples=input_data_location, output_test=settings['slseg_output'])
-            boundary_objects, raw_bounds, raw_text = ss2fb.obtain_boundary_objects(
-                None, slsegged_file_data, None, slseg=True, k=3, get_boundary=False)
+            # slsegged_file_data, loop_breaker = block_slseg_wrapper.run_slseg(
+            #     path_to_slseg_source=os.path.join(settings['root'], 'SLSeg_ver_0.2'), test_samples=input_data_location, output_test=settings['slseg_output'])
             output_slseg_boundaries = open(os.path.join(settings['root'],settings['slseg_output'], f'binary/{sub_path.split(".")[0]}_bin.segdat'), 'w')
+            
+            boundary_objects, raw_bounds, raw_text = ss2fb.obtain_boundary_objects(
+                None, slsegged_file_data, None, gum=True, slseg=False, k=3, get_boundary=False, write_to_file="dependencies.")
             output_slseg_boundaries.write(raw_bounds)
             continue # TODO Implement segbot model here. Raw text below could be switched to the raw text created by Rs3 Parser?
             segbot_input = run_segbot_model(raw_text)

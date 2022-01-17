@@ -2,6 +2,7 @@ import re
 from . import block_text_tilling as tt
 import os
 from nltk.tokenize import word_tokenize
+import xml.etree.ElementTree as ET
 
 segEx = '''<T>
 <P>
@@ -23,6 +24,8 @@ segEx = '''<T>
 </T>
 '''
 # DEPRECIATED Use the Micro logic one instead, that one uses the XML Parser system instead.
+
+
 def new_convert_slseg_2_fb(slseg, indexed_list=False):
     slseg = re.sub(r'-', '', slseg)
     slseg = re.sub(r'["]*', '', slseg)
@@ -122,8 +125,28 @@ def convert_segbot_2_bin(segbot_input):
     print("SEGBOT", my_words)
     return segmentation
 
-
-def obtain_boundary_objects(fis, text, segs, slseg=False, k=3, get_boundary=False):
+def parse_rs3(text):
+    # if 'vavau' not in location:
+    #     return
+    try:
+        rst = ET.fromstring(text)
+        root = rst.getroot()
+        segments = []
+        boundary_raw = [0,]
+        boundary_index = 0
+        for child in root:
+            child_tag = child.tag
+            if child_tag == 'body':
+                # parse the segments in this section
+                for segment_tag in child:
+                    segment_text = segment_tag.text
+                    boundary_index = len(segment_text.split(' '))
+                    boundary_raw.append(boundary_index)
+                    segments += ' ' + segment_text
+        return boundary_raw, segments
+    except OSError as error:
+        print (error)
+def obtain_boundary_objects(fis, text, segs,gum=False, slseg=False, k=3, get_boundary=False, write_to_file=None):
     temp_seg_ex = text
     if (slseg):
         text = re.sub(r'/[.,?\'"`A-Z]*', '', text)
@@ -134,21 +157,34 @@ def obtain_boundary_objects(fis, text, segs, slseg=False, k=3, get_boundary=Fals
         text = re.sub(r' [!]', '!', text)
         text = re.sub(r'(<[/]*[A-Z]*>)', '', text)
         text = re.sub(r'\n', '', text)
+    if gum:
+        boundary_raw, text = parse_rs3(text)
     # print(text)
     # tree, processed_leaves = tt.split(text, show=False)
     tree_list, processed_leaves = tt.split(text, show=False)
     # print(tree_list)
-    # We then need to use the split function (text_tilling version) on 'text' instead of .split() and tile using that instead.
-    boundary_raw = new_convert_slseg_2_fb(temp_seg_ex, indexed_list=True)
+    if slseg:
+        # We then need to use the split function (text_tilling version) on 'text' instead of .split() and tile using that instead.
+        boundary_raw = new_convert_slseg_2_fb(temp_seg_ex, indexed_list=True)
     # boundary_objects = tt.tile(tree, processed_leaves, k, get_boundary=False, )
     # TODO HERE IS WHERE THE ISSUE IS WITH THE 343 instances as opposed to 49/50
-    boundary_objects = tt.tile(fis,
+    boundary_objects, validate, output = tt.tile(fis,
                                tree_list, processed_leaves, k, get_boundary=get_boundary, )
+    boundary_index = 0
     print(len(boundary_objects))
     for b in boundary_objects:
-        b = b[:1]+(b, )+b[1:]
+        if boundary_index in boundary_raw:
+            b += (true, )
+        else:
+            b += (false, )
+
+        boundary_index += 1
     # print(boundary_objects)
-    return boundary_objects, boundary_raw, text
+    if write_to_file:
+        write_to_file = open(write_to_file, 'w')
+        write_to_file.write(boundary_objects)
+    else:
+        return boundary_objects, boundary_raw, text
 
 
 def write_as_dat(variables, data, file, included_bounds=None):

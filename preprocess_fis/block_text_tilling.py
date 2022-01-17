@@ -108,7 +108,7 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True):
         output_to_file['boundaries']['reference'] = example_1_ref
         output_to_file['boundaries']['windowdiff'] = validate
         f.write(json.dumps(output_to_file))
-        return boundaries, validate
+        return boundaries, validate, output_to_file
     else:
         return boundary_objects
 

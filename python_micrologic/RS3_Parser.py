@@ -9,6 +9,8 @@ import xml.etree.ElementTree as ET
 
 
 def parse_rs3(location, bin=True, output_location=None):
+    # if 'vavau' not in location:
+    #     return
     try:
         rst = ET.parse(location)
         root = rst.getroot()
@@ -23,12 +25,12 @@ def parse_rs3(location, bin=True, output_location=None):
             if child_tag == 'body':
                 # parse the segments in this section
                 for segment_tag in child:
-                    segement_text = segment_tag.text
+                    segment_text = segment_tag.text
                     if not bin:
-                        segments.append(segement_text)
-                    elif segement_text:
-                        segments += '0'*(len(segement_text.split(' '))-1)
-                        # segments += '0'*len(segement_text.split(' '))
+                        segments.append(segment_text)
+                    elif segment_text:
+                        segments += '0'*(len(segment_text.strip().split(' '))-1)
+                        # segments += '0'*len(segment_text.split(' '))
                         segments += '1'
             elif child_tag == 'head':
                 # TODO Parse the RST structure here?
@@ -69,10 +71,11 @@ def get_original_text(location=None, write_to_file=None):
             continue
         # parse the segments in this section
         for segment_tag in child:
-            segement_text = segment_tag.text
-            if segement_text != None:
-                original_text += segement_text
+            segment_text = segment_tag.text
+            if segment_text != None:
+                original_text += (" "+segment_text)
 
+    original_text = original_text.replace('  ', ' ')
     original_text = original_text.replace(' .', '. ')
     original_text = original_text.replace(' , ', ', ')
     original_text = original_text.replace(' ,', ', ')
@@ -93,20 +96,22 @@ def get_original_text(location=None, write_to_file=None):
 
 # This code parses the GUM RST bits and produces the raw versions
 # (To be segmented by SLSeg and SEGBot?) and produces the BIN outs from the already GUM-parsed text (taken from the GUM-RST outs)
-rst_directory = '../dependencies/phd_datasets/gum_dataset/rst/rstweb/'
-output_location_raw = '../dependencies/phd_datasets/gum_outputs/original_gum_text/'
-output_location_bin = '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
-list_path = listdir(rst_directory)
-total_files = 5
-file_counter = 1
-for file in list_path:
-    if file_counter > total_files:
-        continue
-    destination = path.join(rst_directory, file)
-    rst_text = parse_rs3(destination, True, output_location_bin)
-    raw_text = get_original_text(destination, output_location_raw)
 
-    file_counter += 1
+# rst_directory = '../dependencies/phd_datasets/gum_dataset/rst/rstweb/'
+# output_location_raw = '../dependencies/phd_datasets/gum_outputs/original_gum_text/'
+# output_location_bin = '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
+# list_path = listdir(rst_directory)
+# total_files = 5
+# file_counter = 1
+# for file in list_path:
+#     if file_counter > total_files:
+#         continue
+#     destination = path.join(rst_directory, file)
+#     rst_text = parse_rs3(destination, True, output_location_bin)
+#     raw_text = get_original_text(destination, output_location_raw)
+
+#     file_counter += 1
+
 # --------------------- END
 
 
