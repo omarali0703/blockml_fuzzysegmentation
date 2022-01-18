@@ -1,7 +1,8 @@
 import io
 from os import write, path, listdir
 import xml.etree.ElementTree as ET
-
+# from ..preprocess_fis.block_text_tilling import tile, split
+# from ..preprocess_fis.block_text_tilling import *
 # Retrieve the segmentations from the RST file.
 # if Bin, return the FuzzySeg version (binary), otherwise return a parsed list
 # Output_location is not including the file name itself. This is taken from the location.
@@ -114,6 +115,32 @@ def get_original_text(location=None, write_to_file=None):
 
 # --------------------- END
 
+def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None):
+    # project_module = __import__('block_text_tilling', level=2)
+    print('t3')
+    # Define treelist
+
+    # GET THE ABS LOCATION FOR THIS
+    to_string = get_original_text(segmented_data, None)
+
+    tree, processed_leaves = split_func(to_string, show=False)
+    # We need to somehow get the true-bounds here for inputs of tile().
+    tiled_data = tile_func(None, processed_leaves, None, 3, get_boundary=True)
+    
+    # GET THE ABS LOCATION FOR THIS
+    dotdat = open(path.join(output_location, 'train.dat'), 'w')
+    
+    data = ""
+    for boundary_element in tiled_data:
+        int_i = boundary_element['l_int']
+        int_j = boundary_element['r_int']
+        e_dis = boundary_element['e_dis']
+        is_boundary = boundary_element['bound'][1]
+        data += f'{is_boundary} {int_i} {int_j} {e_dis} \n'
+    if output_location:
+        dotdat.write(data)
+    else:
+        return data
 
 def get_deps(location=None, rst_data=None):
     if location and not rst_data:

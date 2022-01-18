@@ -2,6 +2,7 @@ import json
 import os
 from . import ss2fb
 from . import block_slseg_wrapper
+from . import block_text_tilling
 INPUT_FLOW = None
 OUTPUT_FLOW = None
 # Entry point for a block

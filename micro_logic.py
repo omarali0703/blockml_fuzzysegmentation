@@ -1,7 +1,8 @@
 import sys
 import os
-import RS3_Parser as rs3parser
-import SLSeg_Parser as slsegparser
+from python_micrologic import RS3_Parser as rs3parser
+from python_micrologic import SLSeg_Parser as slsegparser
+from preprocess_fis.block_text_tilling import *
 from xml.etree.ElementTree import ParseError
 class bcolors:
     HEADER = '\033[95m'
@@ -14,12 +15,13 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 args = sys.argv
-functions = ['slseg', 'rs3parse']
+functions = ['slseg', 'rs3parse', 'rs3trainingdata']
 function_called = args[1]
 location = args[2]
 variables = args[3:5]
+
 error = ''
-# print (variables)
+print (args)
 try:
     list_path = os.listdir(location)
     if function_called not in functions:
@@ -42,6 +44,14 @@ try:
                 continue
             print('begin rs3 parsing')
             rs3parser.parse_rs3(abs_location, *variables)
+    elif function_called == functions[2]: # rs3parse to dat file for training
+        print(f'{bcolors.OKGREEN}Begin generating RS3 training data...')
+        for segfile in list_path:
+            abs_location = os.path.join(location, segfile)
+            
+            print('begin rs3 parsing')
+            rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, *variables)
+    
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")
     sys.exit(error)

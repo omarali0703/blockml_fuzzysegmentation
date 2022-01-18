@@ -10,6 +10,8 @@ function trained = train(training_data_path)
 %     maxU = max(U);
 %     index1 = find(U(1,:) == maxU);
 %     index2 = find(U(1,:) == maxU);
+
+%   Some kind of boundary/no boundary inclusion in the clusters could help to indentify something idk.
     opt = genfisOptions('FCMClustering', 'FISType', 'mamdani');
     opt.NumClusters = 2;
     opt.Verbose = 0;

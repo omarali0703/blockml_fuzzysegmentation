@@ -54,3 +54,6 @@ def parse_slseg(location, bin=True, output_location=None):
         return segments
     except:
         pass
+
+def SLSEG_generate_fis_training_data(segmented_data=None):
+    pass

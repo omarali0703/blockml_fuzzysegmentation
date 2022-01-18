@@ -11,3 +11,10 @@ python3 micro_logic.py slseg '../dependencies/phd_datasets/slseg_outputs/gum/' T
 ```bash
 python3 micro_logic.py rs3parse '../dependencies/phd_datasets/gum_outputs/original_gum_text/' True '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
 ```
+
+## Convering RS3 data to training data for use in our FIS.
+> To train/generate our FIS needed for FuzzySeg, we need to generate 50% training data needed from GUM. To do so we call the below function. 
+> Run the below command from ROOT
+```bash
+python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_outputs/original_gum_text/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/"
+```
