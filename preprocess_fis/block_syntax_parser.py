@@ -26,6 +26,7 @@ print (model_dir)
 parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser  
 # STANFord parser?? 
 def generate_parse_tree(input_str, show=True, parse_type='syntax'):
+    
     # STANFORD PARSER
     # parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar', path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar')
     # sentences = parser.raw_parse_sents((input_str, ))
@@ -54,7 +55,7 @@ def generate_parse_tree(input_str, show=True, parse_type='syntax'):
     for line in sentences:
         for sentence in line:
             # print (type(sentence))
-            # sentence = ParentedTree.convert(sentence)
+            # sentence = ParentedTree.convert(sen§tence)
             sentence_list.append(ParentedTree.convert(sentence))
             # print(get_leaf_from_word_index(sentence, 1))
             # print(get_depth(1, sentence[0], sentence[0][1][1][1]))

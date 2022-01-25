@@ -57,43 +57,53 @@ def parse_rs3(location, bin=True, output_location=None):
 # This is generated using the location var.
 
 
-def get_original_text(location=None, write_to_file=None):
-    rst = ET.parse(location)
-    root = rst.getroot()
-    filename = location.split('/')
-    filename = filename[len(filename)-1]
-    filename = filename.split('.')[0]
-    filename += '_raw_text.txt'
-    original_text = ''
-    for child in root:
-        child_tag = child.tag
-        child_attr = child.attrib
-        if child_tag != 'body':
-            continue
-        # parse the segments in this section
-        for segment_tag in child:
-            segment_text = segment_tag.text
-            if segment_text != None:
-                original_text += (" "+segment_text)
+def get_original_text(location=None, write_to_file=None, called_from_micrologic=False):
+    print('Begin getting original text....')
+    # if called_from_micrologic:
+        # location = path.join('../', location)
+    # TODO Add same IF for write_to_file location -> May not be ness. for now.
+    print (location)
+    
+    try:
+        rst = ET.parse(location)
+        print(rst)
+        root = rst.getroot()
+        filename = location.split('/')
+        filename = filename[len(filename)-1]
+        filename = filename.split('.')[0]
+        filename += '_raw_text.txt'
+        original_text = ''
+        for child in root:
+            child_tag = child.tag
+            child_attr = child.attrib
+            if child_tag != 'body':
+                continue
+            # parse the segments in this section
+            for segment_tag in child:
+                segment_text = segment_tag.text
+                if segment_text != None:
+                    original_text += (" "+segment_text)
 
-    original_text = original_text.replace('  ', ' ')
-    original_text = original_text.replace(' .', '. ')
-    original_text = original_text.replace(' , ', ', ')
-    original_text = original_text.replace(' ,', ', ')
-    original_text = original_text.replace(' :', ': ')
-    original_text = original_text.replace(' \ ', ' ')
-    original_text = original_text.replace(' \'s', '\'')
-    original_text = original_text.replace(' \'', '\'')
+        original_text = original_text.replace('  ', ' ')
+        original_text = original_text.replace(' .', '. ')
+        original_text = original_text.replace(' , ', ', ')
+        original_text = original_text.replace(' ,', ', ')
+        original_text = original_text.replace(' :', ': ')
+        original_text = original_text.replace(' \ ', ' ')
+        original_text = original_text.replace(' \'s', '\'')
+        original_text = original_text.replace(' \'', '\'')
 
-    if write_to_file:
-        write_to_file = path.join(write_to_file, filename)
-        output_file = open(write_to_file, 'w')
-        output_file.write(str(original_text).strip())
-        output_file.close()
-        print(write_to_file)
-        return write_to_file  # Return the location
-    return original_text
-
+        if write_to_file:
+            write_to_file = path.join(write_to_file, filename)
+            output_file = open(write_to_file, 'w')
+            output_file.write(str(original_text).strip())
+            output_file.close()
+            print(write_to_file)
+            return write_to_file  # Return the location
+        return original_text
+    except OSError as error:
+        print(error)
+    
 
 # This code parses the GUM RST bits and produces the raw versions
 # (To be segmented by SLSeg and SEGBot?) and produces the BIN outs from the already GUM-parsed text (taken from the GUM-RST outs)
@@ -115,14 +125,10 @@ def get_original_text(location=None, write_to_file=None):
 
 # --------------------- END
 
+# TODO This will only work if called_from_micrologic is true. We may want to reuse this code layer. Add a boolean (Called_from_micrologic) here to control that.
 def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None):
-    # project_module = __import__('block_text_tilling', level=2)
-    print('t3')
-    # Define treelist
-
-    # GET THE ABS LOCATION FOR THIS
-    to_string = get_original_text(segmented_data, None)
-
+    print(segmented_data)
+    to_string = get_original_text(segmented_data, None, True) # Called from micrologic (var. 3) is an assumption at this point.
     tree, processed_leaves = split_func(to_string, show=False)
     # We need to somehow get the true-bounds here for inputs of tile().
     tiled_data = tile_func(None, processed_leaves, None, 3, get_boundary=True)
