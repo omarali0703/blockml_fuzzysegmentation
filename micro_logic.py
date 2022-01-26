@@ -54,10 +54,13 @@ try:
                 
                 print(f'begin rs3 parsing... {abs_location}')
                 try:
-                    rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0])
-                except:
-                    print (f'Failed to parse {variables}')
+                    rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0], number_of_docs_to_parse_index)
+                    print (f'{bcolors.WARNING}FINISHED PARSING... {variables}')
+
+                except Exception as e:
+                    print (f'{bcolors.FAIL}Failed to parse {variables}, {e}')
                     continue
+                
                 number_of_docs_to_parse_index += 1
             else:
                 break
