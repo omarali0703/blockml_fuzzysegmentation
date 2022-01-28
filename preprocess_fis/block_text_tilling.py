@@ -26,8 +26,18 @@ current_ext_set = []
 output_to_file = {"steps": [], "boundaries": {"computed": "",
                                               "reference": "", "windowdiff": ""}, "sentence": example_2}
 print('BLOCK TEXT TILLING LOADED')
-
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 def split(string, show=True):  # J is the context range (j either side)
+    print (f'{bcolors.OKCYAN}Begin splitting ...')
     processed_leaves = []
     trees = syntax_parser.generate_parse_tree(string, show)
     tree_list = []
@@ -64,6 +74,8 @@ def calculate_boundary(fis, int_coh_i, int_coh_j, ext_dis):
 # True boundaries are a bin rep of the input data.
 # If provided then these are used if get_boundary is true.
 def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None):
+    print (f'{bcolors.OKCYAN}Begin tilling ...')
+
     boundaries = ''
     string_arr_len = len(string_arr)
     boundary_objects = []

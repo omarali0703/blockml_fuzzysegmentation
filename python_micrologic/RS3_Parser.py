@@ -13,8 +13,10 @@ def parse_rs3(location, bin=True, output_location=None):
     # if 'vavau' not in location:
     #     return
     try:
-        rst = ET.parse(location)
-        root = rst.getroot()
+        # rst = ET.parse(location)
+        # root = rst.getroot()
+        context = iter(ET.iterparse(location, events=("start", "end")))
+        event, root = next(context)
         segments = []
         print(output_location)
         for child in root:
@@ -62,12 +64,15 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
     # if called_from_micrologic:
         # location = path.join('../', location)
     # TODO Add same IF for write_to_file location -> May not be ness. for now.
-    print (location)
+    # print (location)
     
     try:
-        rst = ET.parse(location)
-        print(rst)
-        root = rst.getroot()
+        # rst = ET.parse(location)
+        # root = rst.getroot()
+        context = iter(ET.iterparse(location, events=("start", "end")))
+        event, root = next(context)
+        # print (root)
+        # print(rst)
         filename = location.split('/')
         filename = filename[len(filename)-1]
         filename = filename.split('.')[0]
@@ -98,7 +103,7 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
             output_file = open(write_to_file, 'w')
             output_file.write(str(original_text).strip())
             output_file.close()
-            print(write_to_file)
+            # print(write_to_file)
             return write_to_file  # Return the location
         return original_text
     except OSError as error:
@@ -130,6 +135,7 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
     # print(segmented_data)
     # TODO get the segments from the GUM files.
     # Implement the HILDA stuff for the case study. --> Use the Sentiment analysis method to compare my segmentations with theirs. -> FINISH PhD.
+    
     to_string = get_original_text(segmented_data, None, True) # Called from micrologic (var. 3) is an assumption at this point.
     tree, processed_leaves = split_func(to_string, show=False)
     true_boundaries = parse_rs3(segmented_data, bin=True, output_location=None) #Get the bin representation of the boundaries from the rs3 files.

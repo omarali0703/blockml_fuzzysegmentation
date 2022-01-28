@@ -1,15 +1,17 @@
-from nltk import pos_tag, word_tokenize
+from nltk import pos_tag, word_tokenize, internals
 from nltk.wsd import lesk
 from nltk.parse import stanford, bllip
 from nltk.tree import ParentedTree
 from nltk.data import find
+internals.config_java(options='-xmx4G')
 import os
 from spacy.pipeline.dep_parser import DEFAULT_PARSER_MODEL
         
 
 # model_dir = find("models/bllip_wsj_no_aux").path
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, 'jars/')
+dirname = os.path.dirname(dirname) #Get the parent of  __file__'s dir (fuzzy_segmentation folder)
+filename = os.path.join(dirname, 'dependencies/jars/')
 
 def compare_leaves(sentence, leaf_1, leaf_2):
     parent, count = get_lca_dist_list(sentence[0], [leaf_1, leaf_2], 1,1)
@@ -21,20 +23,29 @@ def compare_leaves(sentence, leaf_1, leaf_2):
 
 
 #  Only load this shit once
-model_dir = find('models/bllip_wsj_no_aux').path
-print (model_dir)
-parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser  
+# model_dir = find('models/bllip_wsj_no_aux').path
+# print (model_dir)
+# This can cause that token issue it seams....
+# parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser  
 # STANFord parser?? 
+parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar', path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar', java_options='-mx8G -maxLength=200')
+
+'''
+    TODO::
+    GENERATING INPUTS USING A MINI-PARSER BETWEEN RST AND GENERATE_PARSE_TREE. REDUCE DOWN TEXT INPUTS AND 
+    CAPTURE THE SEGMENTATIOND WITHIN THEM AS A BI-PRODUCT.
+
+'''
+
 def generate_parse_tree(input_str, show=True, parse_type='syntax'):
     
     # STANFORD PARSER
-    # parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar', path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar')
-    # sentences = parser.raw_parse_sents((input_str, ))
+    sentences = parser.raw_parse_sents((input_str, ))
 
     # CHARNIAK
     # print(input_str)
     if parse_type == 'syntax':
-        print(input_str)
+        # print(input_str)
         sentences = parser.parse(input_str)
     elif parse_type == 'dep':
         spacy_dep_tree = None
