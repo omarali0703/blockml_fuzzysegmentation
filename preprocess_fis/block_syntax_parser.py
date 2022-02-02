@@ -28,25 +28,22 @@ def compare_leaves(sentence, leaf_1, leaf_2):
 # This can cause that token issue it seams....
 # parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser  
 # STANFord parser?? 
-parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar', path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar', java_options='-mx8G -maxLength=200')
+parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar', path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar', java_options='-mx8G')
 
-'''
-    TODO::
-    GENERATING INPUTS USING A MINI-PARSER BETWEEN RST AND GENERATE_PARSE_TREE. REDUCE DOWN TEXT INPUTS AND 
-    CAPTURE THE SEGMENTATIOND WITHIN THEM AS A BI-PRODUCT.
-
-'''
 
 def generate_parse_tree(input_str, show=True, parse_type='syntax'):
-    
-    # STANFORD PARSER
-    sentences = parser.raw_parse_sents((input_str, ))
+    print ('Generating parse tree....')
 
     # CHARNIAK
     # print(input_str)
     if parse_type == 'syntax':
         # print(input_str)
-        sentences = parser.parse(input_str)
+
+        # STANFORD PARSER
+        print ('Running Stanford parser')
+        sentences = parser.raw_parse_sents((input_str, ))
+        print ('Finished running Stanford parser')
+        # sentences = parser.parse(input_str)
     elif parse_type == 'dep':
         spacy_dep_tree = None
 

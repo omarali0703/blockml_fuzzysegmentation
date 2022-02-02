@@ -46,13 +46,13 @@ try:
             print('begin rs3 parsing')
             rs3parser.parse_rs3(abs_location, *variables)
     elif function_called == functions[2]: # rs3parse to dat file for training
-        print(f'{bcolors.OKGREEN}Begin generating RS3 training data...')
+        print(f'{bcolors.OKCYAN}Begin generating RS3 training data...')
         number_of_docs_to_parse = args[4]
         for segfile in list_path:
             if number_of_docs_to_parse_index < int(number_of_docs_to_parse):
                 abs_location = os.path.join(location, segfile)
                 
-                print(f'begin rs3 parsing... {abs_location}')
+                print(f'{bcolors.OKCYAN}begin rs3 parsing... {abs_location}')
                 try:
                     rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0], number_of_docs_to_parse_index)
                     print (f'{bcolors.WARNING}FINISHED PARSING... {variables}')

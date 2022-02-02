@@ -36,8 +36,8 @@ def parse_rs3(location, bin=True, output_location=None):
                         # segments += '0'*len(segment_text.split(' '))
                         segments += '1'
             elif child_tag == 'head':
-                # TODO Parse the RST structure here?
-                # TODO RST Main structure is stored here. Links and deps are determined here.
+                #  Parse the RST structure here?
+                #  RST Main structure is stored here. Links and deps are determined here.
                 pass
         if output_location:
             print('saving segments...')
@@ -49,22 +49,20 @@ def parse_rs3(location, bin=True, output_location=None):
             output_location.write(segments)
             output_location.close()
             # print(f'segments saved {file_name}')
-
+        print (segments, len(segments))
         return segments
     except OSError as error:
         print (error)
 
-# Write_to_file is the location of the folder.
-# This should not include the filename at the end.
-# This is generated using the location var.
+'''
+TODO:
+1. remove the data surrounding the sgementation stuff. We only need the <segment> data nothing else. The ET parser has to process all of this.
+'''
 
 
 def get_original_text(location=None, write_to_file=None, called_from_micrologic=False):
     print('Begin getting original text....')
-    # if called_from_micrologic:
-        # location = path.join('../', location)
-    # TODO Add same IF for write_to_file location -> May not be ness. for now.
-    # print (location)
+
     
     try:
         # rst = ET.parse(location)
@@ -130,16 +128,15 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
 
 # --------------------- END
 
-# TODO This will only work if called_from_micrologic is true. We may want to reuse this code layer. Add a boolean (Called_from_micrologic) here to control that.
+
 def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index=None):
     # print(segmented_data)
-    # TODO get the segments from the GUM files.
     # Implement the HILDA stuff for the case study. --> Use the Sentiment analysis method to compare my segmentations with theirs. -> FINISH PhD.
     
     to_string = get_original_text(segmented_data, None, True) # Called from micrologic (var. 3) is an assumption at this point.
     tree, processed_leaves = split_func(to_string, show=False)
     true_boundaries = parse_rs3(segmented_data, bin=True, output_location=None) #Get the bin representation of the boundaries from the rs3 files.
-    tiled_data = tile_func(None, processed_leaves, None, 3, get_boundary=True, true_boundaries=true_boundaries)
+    boundaries, validate, tiled_data = tile_func(None, tree, processed_leaves, 3, get_boundary=True, true_boundaries=true_boundaries)
     
     # GET THE ABS LOCATION FOR THIS]
     if not index:
@@ -147,11 +144,13 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
     dotdat = open(path.join(output_location, f'train_{index}.dat'), 'w')
     
     data = ""
-    for boundary_element in tiled_data:
+    # print ("EH", boundaries, validate, tiled_data)
+    for boundary_element in tiled_data['steps']:
+        print (boundary_element)
         int_i = boundary_element['l_int']
         int_j = boundary_element['r_int']
         e_dis = boundary_element['e_dis']
-        is_boundary = boundary_element['bound'][1]
+        is_boundary = boundary_element['bound']
         data += f'{is_boundary} {int_i} {int_j} {e_dis} \n'
     if output_location:
         dotdat.write(data)

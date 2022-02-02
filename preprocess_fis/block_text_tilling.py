@@ -26,6 +26,8 @@ current_ext_set = []
 output_to_file = {"steps": [], "boundaries": {"computed": "",
                                               "reference": "", "windowdiff": ""}, "sentence": example_2}
 print('BLOCK TEXT TILLING LOADED')
+
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -36,8 +38,10 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
 def split(string, show=True):  # J is the context range (j either side)
-    print (f'{bcolors.OKCYAN}Begin splitting ...')
+    print(f'{bcolors.OKCYAN}Begin splitting ...')
     processed_leaves = []
     trees = syntax_parser.generate_parse_tree(string, show)
     tree_list = []
@@ -74,9 +78,10 @@ def calculate_boundary(fis, int_coh_i, int_coh_j, ext_dis):
 # True boundaries are a bin rep of the input data.
 # If provided then these are used if get_boundary is true.
 def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None):
-    print (f'{bcolors.OKCYAN}Begin tilling ...')
+    print(f'{bcolors.OKCYAN}Begin tilling ...')
 
     boundaries = ''
+    print(len(string_arr))
     string_arr_len = len(string_arr)
     boundary_objects = []
     for tree in tree_list:
@@ -92,7 +97,10 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
             left_pad = abs(k - len(left_string_array))
             if left_pad > 0:
                 left_pad = [PAD_CHAR for pad in range(left_pad)]
+                # print("TEST", left_string_array, left_pad,
+                    #   type(left_string_array), type(left_pad))
                 left_string_array = left_pad + left_string_array
+                print('2')
             right_pad = abs(k - len(right_string_array))
             if right_pad > 0:
                 right_pad = [PAD_CHAR for pad in range(right_pad)]
@@ -111,18 +119,23 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                         boundaries += '1'
                     else:
                         boundaries += '0'
+
+                        output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
                 else:
                     # Get the boundaries from a bin rep of the training data.
+                    print (left_string_array, true_boundaries[i], right_string_array)
                     boundaries = true_boundaries[i]
+                    output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (boundaries), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
 
-                output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
-                    boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
                 current_intj_set.clear()
                 current_inti_set.clear()
                 current_ext_set.clear()
             else:
                 boundary_objects.append(
                     (i, left_internal_coh, right_internal_coh, external_dissim))
+    
+    print (f'{bcolors.OKGREEN}Finished tilling process..... (So close :D!)')
+    
     if get_boundary:
         validate = validator.window_diff(example_1_ref, boundaries, 3)
         output_to_file['boundaries']['computed'] = boundaries
