@@ -3,7 +3,7 @@ float rotateI;
 String[] data;
 
 float[][] trainingData;
-
+float moveX, moveY;
 void setup() {
   size(600, 600, P3D);
   noStroke();
@@ -56,6 +56,7 @@ void draw() {
   text("ext_diss", 0, 0, 0);
   popMatrix();
   noStroke();
+  translate(moveX, moveY, 0);
   for (int i = 0; i < trainingData.length; i++) {
     pushMatrix();
     float [] dataElement = trainingData[i];
@@ -87,6 +88,14 @@ void draw() {
         xx -= 0.05;
       } else if (key == 's' || key == 'S') {
         xx += 0.05;
+      } else if (key=='left') {
+        moveX -= 0.05f;
+      } else if (key=='right') {
+        moveX += 0.05f;
+      } else if (key=='up') {
+        moveY += 0.05f;
+      } else if (key=='down') {
+        moveY -= 0.05f;
       }
     }
   }

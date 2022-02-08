@@ -129,7 +129,7 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
 # --------------------- END
 
 
-def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index=None):
+def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index=0):
     # print(segmented_data)
     # Implement the HILDA stuff for the case study. --> Use the Sentiment analysis method to compare my segmentations with theirs. -> FINISH PhD.
     
@@ -146,7 +146,7 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
     data = ""
     # print ("EH", boundaries, validate, tiled_data)
     for boundary_element in tiled_data['steps']:
-        print (boundary_element)
+        # print (boundary_element)
         int_i = boundary_element['l_int']
         int_j = boundary_element['r_int']
         e_dis = boundary_element['e_dis']

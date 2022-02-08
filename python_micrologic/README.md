@@ -14,9 +14,11 @@ python3 micro_logic.py rs3parse '../dependencies/phd_datasets/gum_outputs/origin
 
 ## Convering RS3 data to training data for use in our FIS.
 > To train/generate our FIS needed for FuzzySeg, we need to generate 50% training data needed from GUM. To do so we call the below function. 
-> Run the below command from ROOT
+> Run the below command from ROOT, the first command is the large ds version for larger memory comps. The second is a small test test that runs a little faster and on low memory comps
 > Final number is the amount of docs to parse into training data.
 > 
 ```bash
 python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/rst/rstweb/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 5
+
+python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/small_sample/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 1
 ```
