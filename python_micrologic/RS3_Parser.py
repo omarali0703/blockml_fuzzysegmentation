@@ -129,19 +129,19 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
 # --------------------- END
 
 
-def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index=0):
+def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index=0, k_size=3):
     # print(segmented_data)
     # Implement the HILDA stuff for the case study. --> Use the Sentiment analysis method to compare my segmentations with theirs. -> FINISH PhD.
     
     to_string = get_original_text(segmented_data, None, True) # Called from micrologic (var. 3) is an assumption at this point.
     tree, processed_leaves = split_func(to_string, show=False)
     true_boundaries = parse_rs3(segmented_data, bin=True, output_location=None) #Get the bin representation of the boundaries from the rs3 files.
-    boundaries, validate, tiled_data = tile_func(None, tree, processed_leaves, 3, get_boundary=True, true_boundaries=true_boundaries)
+    boundaries, validate, tiled_data = tile_func(None, tree, processed_leaves, k_size, get_boundary=True, true_boundaries=true_boundaries)
     
     # GET THE ABS LOCATION FOR THIS]
     if not index:
         index = 'UNDEF'
-    dotdat = open(path.join(output_location, f'train_{index}.dat'), 'w')
+    dotdat = open(path.join(output_location, f'train_{index}_k{k_size}.dat'), 'w')
     
     data = ""
     # print ("EH", boundaries, validate, tiled_data)

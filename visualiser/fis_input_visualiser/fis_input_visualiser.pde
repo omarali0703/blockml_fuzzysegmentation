@@ -8,7 +8,7 @@ void setup() {
   size(600, 600, P3D);
   noStroke();
 
-  data = loadStrings("train.dat");
+  data = loadStrings("train_new_k5.dat");
   trainingData = new float[data.length][4];
   for (int i = 0; i < data.length; i ++) {
     String lineElement = data[i];
@@ -29,6 +29,8 @@ void draw() {
   //rotateZ(PI/4);
   //rotateY(mouseX*0.005);
   translate(width/2, height/2, 0);
+    translate(moveX, moveY, 0);
+
   rotateZ(radians(zz));
   rotateY(radians(yy));
   rotateX(radians(xx));
@@ -56,7 +58,6 @@ void draw() {
   text("ext_diss", 0, 0, 0);
   popMatrix();
   noStroke();
-  translate(moveX, moveY, 0);
   for (int i = 0; i < trainingData.length; i++) {
     pushMatrix();
     float [] dataElement = trainingData[i];
@@ -82,20 +83,20 @@ void draw() {
         print("e");
       } else if (key == 'd' || key == 'D') {
         yy -= 0.05;
-      } else if (key == 'd' || key == 'D') {
+      } else if (key == 'a' || key == 'D') {
         yy -= 0.05;
       } else if (key == 'w' || key == 'W') {
         xx -= 0.05;
       } else if (key == 's' || key == 'S') {
         xx += 0.05;
-      } else if (key=='left') {
-        moveX -= 0.05f;
-      } else if (key=='right') {
-        moveX += 0.05f;
-      } else if (key=='up') {
-        moveY += 0.05f;
-      } else if (key=='down') {
-        moveY -= 0.05f;
+      } else if (key == 'f' || key == 'F') {
+        moveX -= 0.05;
+      } else if (key == 'h' || key == 'H') {
+        moveX += 0.05;
+      } else if (key == 't' || key == 'T') {
+        moveY -= 0.05;
+      } else if (key == 'G' || key == 'g') {
+        moveY += 0.05;
       }
     }
   }
