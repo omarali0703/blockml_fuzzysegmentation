@@ -8,7 +8,7 @@ void setup() {
   size(600, 600, P3D);
   noStroke();
 
-  data = loadStrings("train_new_k5.dat");
+  data = loadStrings("train_new_k4.dat");
   trainingData = new float[data.length][4];
   for (int i = 0; i < data.length; i ++) {
     String lineElement = data[i];
@@ -80,7 +80,6 @@ void draw() {
     if (keyPressed) {
       if (key == 'a' || key == 'A') {
         yy += 0.05;
-        print("e");
       } else if (key == 'd' || key == 'D') {
         yy -= 0.05;
       } else if (key == 'a' || key == 'D') {

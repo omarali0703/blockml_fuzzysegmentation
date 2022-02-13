@@ -20,5 +20,5 @@ python3 micro_logic.py rs3parse '../dependencies/phd_datasets/gum_outputs/origin
 ```bash
 python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/rst/rstweb/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 5
 
-python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/small_sample/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 1
+python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/small_sample/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 1 5
 ```

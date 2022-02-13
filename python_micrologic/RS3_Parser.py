@@ -139,19 +139,26 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
     boundaries, validate, tiled_data = tile_func(None, tree, processed_leaves, k_size, get_boundary=True, true_boundaries=true_boundaries)
     
     # GET THE ABS LOCATION FOR THIS]
+    print(f'Beginning outputs to bin file {output_location}')
     if not index:
         index = 'UNDEF'
     dotdat = open(path.join(output_location, f'train_{index}_k{k_size}.dat'), 'w')
+    print(f'Output file created {output_location}')
+    print(f'Initialising data')
     
     data = ""
     # print ("EH", boundaries, validate, tiled_data)
     for boundary_element in tiled_data['steps']:
         # print (boundary_element)
+
         int_i = boundary_element['l_int']
         int_j = boundary_element['r_int']
         e_dis = boundary_element['e_dis']
         is_boundary = boundary_element['bound']
+        print(f'Writing data... {is_boundary} {int_i} {int_j} {e_dis}')
+        
         data += f'{is_boundary} {int_i} {int_j} {e_dis} \n'
+    print(f'Finished writing data')
     if output_location:
         dotdat.write(data)
     else:

@@ -62,6 +62,20 @@ def compare_words(tree, word_i, word_j):
     sim = syntax_parser.compare_leaves(tree, word_i, word_j)
     return sim
 
+# Comparewords (Uses CompareLeavesAVG method) samples all leaves not just first and last.
+def compare_words_AVG(tree, words):
+    for word in words:
+        if word == "None" or word == "None":
+            return 0
+
+    sim = syntax_parser.compare_leaves_AVG(tree, words)
+    # Words are now tuples ('They', 'PRP')
+    # Use wordnet to compare the two words here.
+    return sim
+
+def internal_cohesion_AVG(tree, word_type, words):
+    # print(splice_i[0], splice_i[len(splice_i)-1])
+    return compare_words_AVG(tree, words)
 
 def internal_cohesion(tree, word_type, splice_i):
     return compare_words(tree, splice_i[0], splice_i[len(splice_i)-1])
@@ -98,19 +112,33 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
             if left_pad > 0:
                 left_pad = [PAD_CHAR for pad in range(left_pad)]
                 # print("TEST", left_string_array, left_pad,
-                    #   type(left_string_array), type(left_pad))
+                #   type(left_string_array), type(left_pad))
                 left_string_array = left_pad + left_string_array
                 print('2')
             right_pad = abs(k - len(right_string_array))
             if right_pad > 0:
                 right_pad = [PAD_CHAR for pad in range(right_pad)]
                 right_string_array += right_pad
-            left_internal_coh = internal_cohesion(
-                tree, 'inti', left_string_array)
-            right_internal_coh = internal_cohesion(
-                tree, 'intj', right_string_array)
-            external_dissim = compare_words(
-                tree, left_string_array[0], right_string_array[len(right_string_array) - 1])
+            
+            # left_internal_coh = internal_cohesion(tree, 'inti', left_string_array)
+            # right_internal_coh = internal_cohesion(tree, 'intj', right_string_array)
+            # external_dissim = compare_words(tree, left_string_array[0], right_string_array[len(right_string_array) - 1])
+            # 
+            #                  ||||||||
+            # AVG method below VVVVVVVV
+            left_internal_coh = internal_cohesion_AVG(tree, 'inti', left_string_array)
+            right_internal_coh = internal_cohesion_AVG(tree, 'intj', right_string_array)
+            # 
+            # 
+            # 
+            # 
+            # TODO Start here with issue.
+            # 
+            # 
+            #
+            # 
+            external_dissim = compare_words_AVG(tree, left_string_array + right_string_array)
+            
             if get_boundary:
                 if not true_boundaries:
                     boundary_score, is_boundary = calculate_boundary(
@@ -120,12 +148,15 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                     else:
                         boundaries += '0'
 
-                        output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
+                        output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
+                            boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
                 else:
                     # Get the boundaries from a bin rep of the training data.
-                    print (left_string_array, true_boundaries[i], right_string_array)
+                    print(left_string_array,
+                          true_boundaries[i], right_string_array)
                     boundaries = true_boundaries[i]
-                    output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (boundaries), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
+                    output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
+                        boundaries), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
 
                 current_intj_set.clear()
                 current_inti_set.clear()
@@ -133,9 +164,9 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
             else:
                 boundary_objects.append(
                     (i, left_internal_coh, right_internal_coh, external_dissim))
-    
-    print (f'{bcolors.OKGREEN}Finished tilling process..... (So close :D!)')
-    
+
+    print(f'{bcolors.OKGREEN}Finished tilling process..... (So close :D!)')
+
     if get_boundary:
         validate = validator.window_diff(example_1_ref, boundaries, 3)
         output_to_file['boundaries']['computed'] = boundaries
