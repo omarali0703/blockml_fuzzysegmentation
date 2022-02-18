@@ -54,7 +54,7 @@ try:
                 
                 print(f'{bcolors.OKCYAN}begin rs3 parsing... {abs_location}')
                 try:
-                    rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0], number_of_docs_to_parse_index, int(variables[2]))
+                    rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0], str(number_of_docs_to_parse_index), int(variables[2]))
                     print (f'{bcolors.WARNING}FINISHED PARSING... {variables}')
 
                 except Exception as e:

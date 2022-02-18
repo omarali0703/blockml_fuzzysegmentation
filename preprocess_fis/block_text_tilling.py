@@ -63,9 +63,13 @@ def compare_words(tree, word_i, word_j):
     return sim
 
 # Comparewords (Uses CompareLeavesAVG method) samples all leaves not just first and last.
+
+
 def compare_words_AVG(tree, words):
     for word in words:
-        if word == "None" or word == "None":
+        if word[0] == "NULL" or word[0] == "None":
+            print("is null")
+
             return 0
 
     sim = syntax_parser.compare_leaves_AVG(tree, words)
@@ -73,9 +77,11 @@ def compare_words_AVG(tree, words):
     # Use wordnet to compare the two words here.
     return sim
 
+
 def internal_cohesion_AVG(tree, word_type, words):
     # print(splice_i[0], splice_i[len(splice_i)-1])
     return compare_words_AVG(tree, words)
+
 
 def internal_cohesion(tree, word_type, splice_i):
     return compare_words(tree, splice_i[0], splice_i[len(splice_i)-1])
@@ -119,26 +125,31 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
             if right_pad > 0:
                 right_pad = [PAD_CHAR for pad in range(right_pad)]
                 right_string_array += right_pad
-            
+
             # left_internal_coh = internal_cohesion(tree, 'inti', left_string_array)
             # right_internal_coh = internal_cohesion(tree, 'intj', right_string_array)
             # external_dissim = compare_words(tree, left_string_array[0], right_string_array[len(right_string_array) - 1])
-            # 
+            #
             #                  ||||||||
             # AVG method below VVVVVVVV
-            left_internal_coh = internal_cohesion_AVG(tree, 'inti', left_string_array)
-            right_internal_coh = internal_cohesion_AVG(tree, 'intj', right_string_array)
-            # 
-            # 
-            # 
-            # 
-            # TODO Start here with issue.
-            # 
-            # 
+            left_internal_coh = internal_cohesion_AVG(
+                tree, 'inti', left_string_array)
+            right_internal_coh = internal_cohesion_AVG(
+                tree, 'intj', right_string_array)
             #
-            # 
-            external_dissim = compare_words_AVG(tree, left_string_array + right_string_array)
-            
+            #
+            #
+            #
+            # TODO Start here with issue.
+            #
+            #
+            #
+            #
+            (print("calc exd", left_string_array, right_string_array,
+                   type(left_string_array), type(right_string_array)))
+            external_dissim = compare_words_AVG(
+                tree, left_string_array + right_string_array)
+
             if get_boundary:
                 if not true_boundaries:
                     boundary_score, is_boundary = calculate_boundary(
@@ -152,8 +163,7 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                             boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
                 else:
                     # Get the boundaries from a bin rep of the training data.
-                    print(left_string_array,
-                          true_boundaries[i], right_string_array)
+                    print(i, len(true_boundaries))
                     boundaries = true_boundaries[i]
                     output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
                         boundaries), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})

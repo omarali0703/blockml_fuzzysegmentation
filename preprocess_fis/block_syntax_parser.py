@@ -33,7 +33,7 @@ def compare_leaves_AVG(sentence, leaves):
     parent, count = get_lca_dist_list(sentence[0], leaves, 1, 1)
     # print(count, parent, leaf_1, get_depth(1, parent, leaf_1), get_depth(1, parent, leaf_2))
     avg_depth = 0
-    print (type(leaves))
+    # print (type(leaves))
     for leaf in leaves:
         leaf_depth = get_depth(1, parent, leaf)
         avg_depth += leaf_depth
@@ -110,7 +110,7 @@ def to_nltk_tree(node):
 
 
 def get_lca_dist(root, n1, n2, count1, count2):
-    # print(n1, n2)
+    # print(root, "END ROOT", n1, n2, count1, count2, type(root), type(n1), type(n2), type(count1), type(count2))
     if n2 == None:
         return n1.parent(), max(count1, count2)
     if n1 == None:

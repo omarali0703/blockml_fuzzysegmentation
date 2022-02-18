@@ -26,3 +26,17 @@ python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets
 ```bash
 python3 mlflow.py run fuzzy_segmentation preprocess_fis 'phd_datasets/gum_outputs/original_gum_text' '{"type":"syntax", "is_dir":"True", "slseg_output":"phd_datasets/slseg_outputs/gum", "segbot_output_path":"phd_datasets/segbot_outputs/gum"}'
 ```
+
+### Training and running fuzzy segmentation 
+
+This will run all of them in a file and produce outputs.
+
+```bash
+python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fis_training/" '{"none":"none"}'
+```
+
+This will only run using the one dataset. We only want to train once in this instance.
+
+```bash
+python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_2_k3.dat"}'
+```

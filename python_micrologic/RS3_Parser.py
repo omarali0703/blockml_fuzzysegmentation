@@ -1,4 +1,5 @@
 import io
+import gc
 from os import write, path, listdir
 import xml.etree.ElementTree as ET
 # from ..preprocess_fis.block_text_tilling import tile, split
@@ -129,7 +130,7 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
 # --------------------- END
 
 
-def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index=0, k_size=3):
+def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index='0', k_size=3):
     # print(segmented_data)
     # Implement the HILDA stuff for the case study. --> Use the Sentiment analysis method to compare my segmentations with theirs. -> FINISH PhD.
     
@@ -140,8 +141,7 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
     
     # GET THE ABS LOCATION FOR THIS]
     print(f'Beginning outputs to bin file {output_location}')
-    if not index:
-        index = 'UNDEF'
+   
     dotdat = open(path.join(output_location, f'train_{index}_k{k_size}.dat'), 'w')
     print(f'Output file created {output_location}')
     print(f'Initialising data')
@@ -155,10 +155,11 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
         int_j = boundary_element['r_int']
         e_dis = boundary_element['e_dis']
         is_boundary = boundary_element['bound']
-        print(f'Writing data... {is_boundary} {int_i} {int_j} {e_dis}')
+        # print(f'Writing data... {is_boundary} {int_i} {int_j} {e_dis}')
         
         data += f'{is_boundary} {int_i} {int_j} {e_dis} \n'
     print(f'Finished writing data')
+    gc.collect(generation=2)
     if output_location:
         dotdat.write(data)
     else:
