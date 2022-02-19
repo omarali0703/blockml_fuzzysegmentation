@@ -1,4 +1,5 @@
 import sys
+import math
 # take an input segmentation, and a ground truth segmentation to validate.
 def window_diff(true_segmentation, proposed_segmentation, k=1, boundary=1):
     
@@ -18,8 +19,27 @@ def window_diff(true_segmentation, proposed_segmentation, k=1, boundary=1):
 
 # print(window_diff(test_1, test_2, 1))
 
-def window_pr(proposed_segmentation, true_segmentation):
-    return 'None'
+def window_pr(proposed_segmentation, true_segmentation, k=3, boundary=1):
+    true_positive = 0
+    true_negative = -k*(k-1)
+    false_positive = 0
+    false_negative = 0
+    # print(true_segmentation, proposed_segmentation)
+    if len(true_segmentation) != len(proposed_segmentation):
+        print("error")
+    
+    for i in range(1-k, len(true_segmentation)):
+        true_positive += min(true_segmentation[i:i+k].count(boundary), proposed_segmentation[i:i+k].count(boundary))
+        true_negative += k-max(true_segmentation[i:i+k].count(boundary), proposed_segmentation[i:i+k].count(boundary))
+        false_positive += max(0, (true_segmentation[i:i+k].count(boundary) - proposed_segmentation[i:i+k].count(boundary)))
+        false_negative += max(0, (proposed_segmentation[i:i+k].count(boundary) - true_segmentation[i:i+k].count(boundary)))
+    
+    precision = true_positive/(true_positive + false_positive)
+    recall = true_positive/(true_positive + false_negative)
+    accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
+    f1_score = true_positive/(true_positive + 0.5 * (false_positive+false_negative))
+
+    return precision, recall, accuracy
 
 # Traditional metric used everywhere.
 def beefermans(proposed_segmentation, true_segmentation):
