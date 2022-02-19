@@ -40,3 +40,9 @@ This will only run using the one dataset. We only want to train once in this ins
 ```bash
 python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_2_k3.dat"}'
 ```
+
+Run the run + validation flow
+
+```bash
+python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_2_k3.dat"}'
+```

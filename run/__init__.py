@@ -9,7 +9,7 @@ POSSIBLE_PATH_MODE = ["block_syntax_parser", "block_dependency_parser"]
 
 # Entry point for a block
 test_looper = 1
-def start(input_data=None, settings={}, loop_breaker):
+def start(input_data=None, settings={}, loop_breaker=None):
     print(f"RUNNING.... My input data is\n{input_data}")
 
     if test_looper > 3:

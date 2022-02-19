@@ -2,7 +2,8 @@ function trained = train(training_data_path)
     fcmdata = load(training_data_path);
     outputdata = fcmdata(:,1);
     inputdata = fcmdata(:,2:4);
-    
+    options = [3.0 NaN NaN 0];
+    [centers,U] = fcm(inputdata,2,options);
 %     [centers] = fcm(inputdata,2,options);
     
 %     maxU = max(U);
