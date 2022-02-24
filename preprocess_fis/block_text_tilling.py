@@ -136,15 +136,7 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                 tree, 'inti', left_string_array)
             right_internal_coh = internal_cohesion_AVG(
                 tree, 'intj', right_string_array)
-            #
-            #
-            #
-            #
-            # TODO Start here with issue.
-            #
-            #
-            #
-            #
+           
             (print("calc exd", left_string_array, right_string_array,
                    type(left_string_array), type(right_string_array)))
             external_dissim = compare_words_AVG(

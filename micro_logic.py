@@ -2,7 +2,6 @@ import sys
 import os
 from python_micrologic import RS3_Parser as rs3parser
 from python_micrologic import SLSeg_Parser as slsegparser
-from preprocess_fis.block_text_tilling import *
 from xml.etree.ElementTree import ParseError
 class bcolors:
     HEADER = '\033[95m'
@@ -17,14 +16,17 @@ class bcolors:
 args = sys.argv
 print (args)
 
-functions = ['slseg', 'rs3parse', 'rs3trainingdata']
+functions = ['slseg', 'rs3parse', 'rs3trainingdata', 'rs3originaltext', 'validateboundaries']
 function_called = args[1]
 location = args[2]
 variables = args[3:6]
 number_of_docs_to_parse_index = 0
 error = ''
 try:
+
     list_path = os.listdir(location)
+    print (variables)
+    print (location)
     if function_called not in functions:
         print (f'{bcolors.WARNING}Incorrect function.')
         raise
@@ -43,9 +45,11 @@ try:
             abs_location = os.path.join(location, segfile)
             if os.path.isdir(abs_location):
                 continue
-            print('begin rs3 parsing')
+            print(f'Parsing {segfile}')
             rs3parser.parse_rs3(abs_location, *variables)
     elif function_called == functions[2]: # rs3parse to dat file for training
+        from preprocess_fis.block_text_tilling import *
+
         print(f'{bcolors.OKCYAN}Begin generating RS3 training data...')
         number_of_docs_to_parse = args[4]
         for segfile in list_path:
@@ -64,6 +68,22 @@ try:
                 number_of_docs_to_parse_index += 1
             else:
                 break
+    elif function_called == functions[3]:
+
+        print(f'{bcolors.OKCYAN}Begin generating original text from RS3...')
+        for segfile in list_path:
+            abs_location = os.path.join(location, segfile)
+            print(abs_location)
+            rs3parser.get_original_text(abs_location,  variables[0])
+    elif function_called == functions[4]:
+        from results.block_validators import *
+
+        print(f'{bcolors.OKCYAN}Begin validating boundaries at selected directories...')
+        for segfile in list_path:
+            abs_location = os.path.join(location, segfile)
+            filename = segfile.split('.')[0]
+
+            reference_list_path = variables[0]
     
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")

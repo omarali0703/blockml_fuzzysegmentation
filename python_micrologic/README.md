@@ -9,8 +9,29 @@ python3 micro_logic.py slseg '../dependencies/phd_datasets/slseg_outputs/gum/' T
 ## RS3 parsing with the micro logic script
 > We need to use this code to parse the outputs of GUM. Whilst we have already done this, we may want more GUM data later so its good to have this here. This is also the wrong paths so we need to alter it.
 ```bash
-python3 micro_logic.py rs3parse '../dependencies/phd_datasets/gum_outputs/original_gum_text/' True '../dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
+python3 micro_logic.py rs3parse 'dependencies/phd_datasets/gum_dataset/small_sample' True 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
 ```
+
+### Converting some RS3 data to original text
+```bash
+python3 micro_logic.py rs3originaltext 'dependencies/phd_datasets/gum_dataset/small_sample' 'dependencies/phd_datasets/gum_outputs/original_gum_text'
+```
+
+### Validate a set of refs and computed boundaries
+```bash
+python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/gum_dataset/small_sample' 'dependencies/phd_datasets/gum_outputs/original_gum_text'
+```
+
+## RST Workflow (Testing and validating SLSeg)
+1. Convert RS3 data to text data --> Run **Converting some RS3 data to original text** first, to generate our test data in TEXT form
+2. Get GUM reference using **RST parking with micro logic script**
+3. Run SLSeg on that data to get its segmentation.
+4. run ```bash python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50```
+5. Delete everything BUT the contents of folder_5. such that the "gum" folder only contains the .rs3 files.
+6. Parse these outputs using **SLSeg Parsing with the micro logic script** command.
+7. Run the **Validate a set of refs and computed boundaries** command to produce your results
+8. Dance and sing, for you have compared a given method to the ground truth.
+
 
 ## Convering RS3 data to training data for use in our FIS.
 > To train/generate our FIS needed for FuzzySeg, we need to generate 50% training data needed from GUM. To do so we call the below function. 

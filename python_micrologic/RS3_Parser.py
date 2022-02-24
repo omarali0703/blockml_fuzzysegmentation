@@ -55,10 +55,6 @@ def parse_rs3(location, bin=True, output_location=None):
     except OSError as error:
         print (error)
 
-'''
-TODO:
-1. remove the data surrounding the sgementation stuff. We only need the <segment> data nothing else. The ET parser has to process all of this.
-'''
 
 
 def get_original_text(location=None, write_to_file=None, called_from_micrologic=False):
