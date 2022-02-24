@@ -8,7 +8,6 @@ def window_diff(true_segmentation, proposed_segmentation, k=1, boundary=1):
         print("error")
         # raise ValueError("Segmentations have unequal length")
     wd = 0
-    print (len(true_segmentation))
     for i in range(len(true_segmentation) - k):
         wd += abs(true_segmentation[i:i+k+1].count(boundary) - proposed_segmentation[i:i+k+1].count(boundary))
     print (wd)
@@ -46,9 +45,9 @@ def beefermans(proposed_segmentation, true_segmentation):
     return 'None'
 
 # Method that obtains the prec recall and accuracy using naive maths.
-def basic_metric(proposed_segmentation, true_segmentation):
-    h = proposed_segmentation.count(1) # Total computed bondaries
-    g = true_segmentation.count(1) # Total reference bondaries
+def basic_metric(proposed_segmentation, true_segmentation, boundary=1):
+    h = proposed_segmentation.count(boundary) # Total computed bondaries
+    g = true_segmentation.count(boundary) # Total reference bondaries
     c = 0 # Correctly identified segmentations
     if len(proposed_segmentation) != len(true_segmentation):
         sys.exit("Computed and reference boundaries must have the same length.")

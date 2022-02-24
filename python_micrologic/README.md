@@ -18,8 +18,9 @@ python3 micro_logic.py rs3originaltext 'dependencies/phd_datasets/gum_dataset/sm
 ```
 
 ### Validate a set of refs and computed boundaries
+The inputs are taken as binaries here. First directory is the ref boundary locations, the second is the computed.
 ```bash
-python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/gum_dataset/small_sample' 'dependencies/phd_datasets/gum_outputs/original_gum_text'
+python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin' 'dependencies/phd_datasets/slseg_outputs/gum/binary'
 ```
 
 ## RST Workflow (Testing and validating SLSeg)
