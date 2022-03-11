@@ -24,7 +24,7 @@ functions = ['slseg', 'rs3parse', 'rs3trainingdata',
     'rs3originaltext', 'validateboundaries']
 function_called = args[1]
 location = args[2]
-variables = args[3:6]
+variables = args[3:7]
 number_of_docs_to_parse_index = 0
 error = ''
 try:
@@ -64,7 +64,7 @@ try:
                 print(f'{bcolors.OKCYAN}begin rs3 parsing... {abs_location}')
                 try:
                     rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0], str(
-                        number_of_docs_to_parse_index), int(variables[2]))
+                        number_of_docs_to_parse_index), int(variables[2]), parse_type=variables[3])
                     print(f'{bcolors.WARNING}FINISHED PARSING... {variables}')
 
                 except Exception as e:
@@ -110,14 +110,17 @@ try:
                 if filename not in ref_comp_pairs:
                     print(
                         f"{bcolors.FAIL}Error parsing: computed file {filename}, doesn't have a counterpart in the reference boundary directory.")
-                    raise
+                    continue
                 ref_comp_pairs[filename].append(file_contents)
 
         win_diff = 0
         win_pr = 0, 0, 0
         basic_met = 0, 0, 0
+        print (ref_comp_pairs)
         for boundary_pairs in ref_comp_pairs:
             pairs = ref_comp_pairs[boundary_pairs]
+            if len(pairs <= 1):
+                continue 
             reference_pair = pairs[0]
             calculated_pair = pairs[1]
             calc_win_diff = window_diff(reference_pair, calculated_pair, k=1, boundary="1")

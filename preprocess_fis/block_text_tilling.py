@@ -40,11 +40,12 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-def split(string, show=True):  # J is the context range (j either side)
+def split(string, show=True, parse_type='syntax'):  # J is the context range (j either side)
     print(f'{bcolors.OKCYAN}Begin splitting ...')
     processed_leaves = []
-    trees = syntax_parser.generate_parse_tree(string, show)
+    trees = syntax_parser.generate_parse_tree(string, show, parse_type=parse_type)
     tree_list = []
+    print (trees)
     for t in trees:
         for i in range(len(t.leaves())):
             leaf = t.leaf_treeposition(i)
@@ -122,6 +123,7 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                 left_string_array = left_pad + left_string_array
                 print('2')
             right_pad = abs(k - len(right_string_array))
+            print (k, len(right_string_array))
             if right_pad > 0:
                 right_pad = [PAD_CHAR for pad in range(right_pad)]
                 right_string_array += right_pad
@@ -137,8 +139,8 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
             right_internal_coh = internal_cohesion_AVG(
                 tree, 'intj', right_string_array)
            
-            (print("calc exd", left_string_array, right_string_array,
-                   type(left_string_array), type(right_string_array)))
+            # (print("calc exd", left_string_array, right_string_array,
+            #        type(left_string_array), type(right_string_array)))
             external_dissim = compare_words_AVG(
                 tree, left_string_array + right_string_array)
 
@@ -157,6 +159,7 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                     # Get the boundaries from a bin rep of the training data.
                     print(i, len(true_boundaries))
                     boundaries = true_boundaries[i]
+                    # print(right_string_array)
                     output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
                         boundaries), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
 

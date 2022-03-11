@@ -28,9 +28,9 @@ Run on smaller set that is used by Fuzzy Seg.
 python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50
 ```
 
-### Running SLSeg & Segbot with Settings (Using the preprocess block) (GUM Dataset)
+### Running Segbot (GUM Dataset)
 ```bash
-python3 mlflow.py run fuzzy_segmentation preprocess_fis 'phd_datasets/gum_outputs/original_gum_text' '{"type":"syntax", "is_dir":"True", "slseg_output":"phd_datasets/slseg_outputs/gum", "segbot_output_path":"phd_datasets/segbot_outputs/gum"}'
+python3 run_segbot.py '../phd_datasets/gum_outputs/original_gum_text' '../phd_datasets/segbot_outputs/gum' 
 ```
 
 ### Training and running fuzzy segmentation 
@@ -50,5 +50,9 @@ python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fi
 Run the run + validation flow
 
 ```bash
-python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_2_k3.dat"}'
+python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k3_char.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k3_char.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_2_k3_char.dat"}'
+
+python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k5_char.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k5_char.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_2_k5_char.dat"}'
+
+python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/syntax/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/syntax/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/syntax/train_2_k3.dat"}'
 ```

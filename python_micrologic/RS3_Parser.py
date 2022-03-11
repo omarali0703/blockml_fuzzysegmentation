@@ -13,6 +13,8 @@ import xml.etree.ElementTree as ET
 def parse_rs3(location, bin=True, output_location=None):
     # if 'vavau' not in location:
     #     return
+    bin = True if bin == "True" or bin == "true" else False
+    print ("to bin?", type(bin))
     try:
         # rst = ET.parse(location)
         # root = rst.getroot()
@@ -47,7 +49,7 @@ def parse_rs3(location, bin=True, output_location=None):
             file_name = file_name[len(file_name)-1]
             output_location = path.join(output_location, file_name)
             output_location = open(output_location, 'w')
-            output_location.write(segments)
+            output_location.write(str(segments))
             output_location.close()
             # print(f'segments saved {file_name}')
         print (segments, len(segments))
@@ -126,23 +128,23 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
 # --------------------- END
 
 
-def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index='0', k_size=3):
+def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index='0', k_size=3, parse_type='syntax'):
     # print(segmented_data)
     # Implement the HILDA stuff for the case study. --> Use the Sentiment analysis method to compare my segmentations with theirs. -> FINISH PhD.
     
     to_string = get_original_text(segmented_data, None, True) # Called from micrologic (var. 3) is an assumption at this point.
-    tree, processed_leaves = split_func(to_string, show=False)
+    tree, processed_leaves = split_func(to_string, show=False, parse_type=parse_type)
     true_boundaries = parse_rs3(segmented_data, bin=True, output_location=None) #Get the bin representation of the boundaries from the rs3 files.
     boundaries, validate, tiled_data = tile_func(None, tree, processed_leaves, k_size, get_boundary=True, true_boundaries=true_boundaries)
     
     # GET THE ABS LOCATION FOR THIS]
     print(f'Beginning outputs to bin file {output_location}')
    
-    dotdat = open(path.join(output_location, f'train_{index}_k{k_size}.dat'), 'w')
     print(f'Output file created {output_location}')
     print(f'Initialising data')
     
-    data = ""
+    # data = ""
+    data_to_write_to_file = ""
     # print ("EH", boundaries, validate, tiled_data)
     for boundary_element in tiled_data['steps']:
         # print (boundary_element)
@@ -153,13 +155,16 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
         is_boundary = boundary_element['bound']
         # print(f'Writing data... {is_boundary} {int_i} {int_j} {e_dis}')
         
-        data += f'{is_boundary} {int_i} {int_j} {e_dis} \n'
+        data_to_write_to_file += f'{is_boundary} {int_i} {int_j} {e_dis} \n'
     print(f'Finished writing data')
-    gc.collect(generation=2)
+    # gc.collect(generation=2)
     if output_location:
-        dotdat.write(data)
+        print(len(data_to_write_to_file.split('\n')))
+        dotdat = open(path.join(output_location, f'train_{index}_k{k_size}_{parse_type}.dat'), 'w')
+        dotdat.write(data_to_write_to_file)
+        dotdat.close()
     else:
-        return data
+        return data_to_write_to_file
 
 def get_deps(location=None, rst_data=None):
     if location and not rst_data:

@@ -20,7 +20,12 @@ python3 micro_logic.py rs3originaltext 'dependencies/phd_datasets/gum_dataset/sm
 ### Validate a set of refs and computed boundaries
 The inputs are taken as binaries here. First directory is the ref boundary locations, the second is the computed.
 ```bash
+# Code for SLSeg
 python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin' 'dependencies/phd_datasets/slseg_outputs/gum/binary'
+
+# Code for SEGBOT
+python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/segbot_outputs/gum/' 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin' 
+
 ```
 
 ## RST Workflow (Testing and validating SLSeg)
@@ -35,12 +40,24 @@ python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/gum_outputs
 
 
 ## Convering RS3 data to training data for use in our FIS.
-> To train/generate our FIS needed for FuzzySeg, we need to generate 50% training data needed from GUM. To do so we call the below function. 
+> To train/generate our FIS needed for FuzzySeg, we need to generate 50% training data needed from GUM. To do so we call the below function.
 > Run the below command from ROOT, the first command is the large ds version for larger memory comps. The second is a small test test that runs a little faster and on low memory comps
 > Final number is the amount of docs to parse into training data.
-> 
-```bash
-python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/rst/rstweb/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 5
+> If running in DEP mode. Make sure to run the CoreNLP server on port9000. https://stanfordnlp.github.io/CoreNLP/download.html
 
-python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/small_sample/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 1 5
+```bash
+# For DEP mode, first run:
+java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000
+# inside the CoreNLP Dependency folder.
+```
+
+```bash
+# Syntax Mode
+python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/rst/rstweb/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 5 'syntax'
+
+python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/small_sample/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 1 5 'syntax'
+
+# DEP mode.
+python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/small_sample/" "dependencies/phd_datasets/fuzzyseg_outputs/fis_training/" 1 5 'dep'
+
 ```

@@ -8,7 +8,7 @@ void setup() {
   size(600, 600, P3D);
   noStroke();
 
-  data = loadStrings("train_0_k5.dat");
+  data = loadStrings("train_0_k3_char.dat");
   trainingData = new float[data.length][4];
   for (int i = 0; i < data.length; i ++) {
     String lineElement = data[i];

@@ -79,8 +79,8 @@ def run_all_validators(proposed_segmentation=None, true_segmentation=None, batch
     
     elif not batch and (proposed_segmentation and true_segmentation):
         # Run is singular mode
-        window_diff_ =   window_diff   (proposed_segmentation, true_segmentation)
-        window_pr_ =     window_pr    (proposed_segmentation, true_segmentation)
+        window_diff_ =   window_diff   (proposed_segmentation, true_segmentation, k=1)
+        window_pr_ =     window_pr    (proposed_segmentation, true_segmentation, k=3)
         beefermans_ =    beefermans   (proposed_segmentation, true_segmentation)
         basic_metric_p, basic_metric_r, basic_metric_a =  basic_metric (proposed_segmentation, true_segmentation)
 
