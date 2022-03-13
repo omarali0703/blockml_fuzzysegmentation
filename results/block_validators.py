@@ -5,7 +5,8 @@ def window_diff(true_segmentation, proposed_segmentation, k=1, boundary=1):
     
     # print(true_segmentation, proposed_segmentation)
     if len(true_segmentation) != len(proposed_segmentation):
-        print("error")
+        sys.exit("Computed and reference boundaries must have the same length.")
+        
         # raise ValueError("Segmentations have unequal length")
     wd = 0
     for i in range(len(true_segmentation) - k):
@@ -25,7 +26,8 @@ def window_pr(proposed_segmentation, true_segmentation, k=3, boundary=1):
     false_negative = 0
     # print(true_segmentation, proposed_segmentation)
     if len(true_segmentation) != len(proposed_segmentation):
-        print("error")
+        sys.exit("Computed and reference boundaries must have the same length.")
+
     
     for i in range(1-k, len(true_segmentation)):
         true_positive += min(true_segmentation[i:i+k].count(boundary), proposed_segmentation[i:i+k].count(boundary))
@@ -54,10 +56,10 @@ def basic_metric(proposed_segmentation, true_segmentation, boundary=1):
     
     # Iterate to find the correct and incorrect segmentations
     h_index = 0
-    for boundary in proposed_segmentation:  
-        boundary = int(boundary)
+    for b in proposed_segmentation:  
+        b = int(b)
         # print (boundary, true_segmentation[h_index], true_segmentation[h_index] == int(boundary))
-        if boundary==1 and true_segmentation[h_index] == boundary:
+        if b==1 and true_segmentation[h_index] == boundary:
             # print('fuck')
             c += 1
             
@@ -65,6 +67,7 @@ def basic_metric(proposed_segmentation, true_segmentation, boundary=1):
     # print (c, h, g)
     precision = c / h
     recall = c / g
+
     f1_score = (2 * c) / (g + h)
     return precision, recall, f1_score
 

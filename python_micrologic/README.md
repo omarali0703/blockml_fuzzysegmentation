@@ -12,6 +12,13 @@ python3 micro_logic.py slseg '../dependencies/phd_datasets/slseg_outputs/gum/' T
 python3 micro_logic.py rs3parse 'dependencies/phd_datasets/gum_dataset/small_sample' True 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin/'
 ```
 
+## Sentence-clause parsing a set of text
+> We Sentence-clause parse to produce a simple benchmark to compare the rest of the results with.
+
+```bash
+python3 micro_logic.py clauseparse 'dependencies/phd_datasets/gum_dataset/small_sample' 'dependencies/phd_datasets/clause_outputs/'
+```
+
 ### Converting some RS3 data to original text
 ```bash
 python3 micro_logic.py rs3originaltext 'dependencies/phd_datasets/gum_dataset/small_sample' 'dependencies/phd_datasets/gum_outputs/original_gum_text'
@@ -24,9 +31,10 @@ The inputs are taken as binaries here. First directory is the ref boundary locat
 python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin' 'dependencies/phd_datasets/slseg_outputs/gum/binary'
 
 # Code for SEGBOT
-python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/segbot_outputs/gum/' 'dependencies/phd_datasets/gum_outputs/original_gum_text_bin' 
+python3 micro_logic.py validateboundaries 'dependencies/phd_datasets/segbot_outputs/SEGBOT_TEST' 'dependencies/phd_datasets/gum_outputs/original_gum_text_SEGBOT_TEST' 
 
 ```
+
 
 ## RST Workflow (Testing and validating SLSeg)
 1. Convert RS3 data to text data --> Run **Converting some RS3 data to original text** first, to generate our test data in TEXT form

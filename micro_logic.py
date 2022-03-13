@@ -21,7 +21,7 @@ args = sys.argv
 print(args)
 
 functions = ['slseg', 'rs3parse', 'rs3trainingdata',
-    'rs3originaltext', 'validateboundaries']
+    'rs3originaltext', 'validateboundaries', 'clauseparse']
 function_called = args[1]
 location = args[2]
 variables = args[3:7]
@@ -117,9 +117,10 @@ try:
         win_pr = 0, 0, 0
         basic_met = 0, 0, 0
         print (ref_comp_pairs)
+        total_compares = 0
         for boundary_pairs in ref_comp_pairs:
             pairs = ref_comp_pairs[boundary_pairs]
-            if len(pairs <= 1):
+            if len(pairs) <= 1:
                 continue 
             reference_pair = pairs[0]
             calculated_pair = pairs[1]
@@ -127,18 +128,39 @@ try:
             calc_win_pr = window_pr(calculated_pair, reference_pair, boundary="1")
             calc_basic_metric = basic_metric(calculated_pair, reference_pair, boundary="1")
             print(calc_win_diff, calc_win_pr, calc_basic_metric)
+            total_compares += 1
             win_diff += calc_win_diff
             win_pr = tuple(map(lambda i, j: i+j, basic_met, calc_win_pr))
             basic_met = tuple(map(lambda i, j: i+j, basic_met, calc_basic_metric))
         
-        win_pr = tuple(map(lambda i: i/len(ref_comp_pairs), win_pr))
-        basic_met = tuple(map(lambda i: i/len(ref_comp_pairs), basic_met))
-        win_diff = win_diff/len(ref_comp_pairs)
+        win_pr = tuple(map(lambda i: i/total_compares, win_pr))
+        basic_met = tuple(map(lambda i: i/total_compares, basic_met))
+        win_diff = win_diff/total_compares
 
         print (f"{bcolors.OKGREEN}Window Diff: {win_diff}")
         print (f"{bcolors.OKGREEN}Basic Metric: {basic_met}")
         print (f"{bcolors.OKGREEN}Window PR: {win_pr}")
+    elif function_called == functions[5]:
+        for segfile in list_path:
+            abs_location = os.path.join(location, segfile)
+            filename = segfile.split('.')
+            file_extension = filename[1]
+            filename = filename[0]
 
+            if file_extension in ['txt', 'rs3']:
+                file_contents = open(abs_location, "r").read()
+                clause_markers = [',', '.', ';', ':']
+                for marker in clause_markers:
+                    file_contents = file_contents.replace(marker, '|')
+                file_contents = file_contents.split('|')
+                binary_contents = '1'
+                for segments in file_contents:
+                    binary_contents += f"{'0'*len(segments.split(' ')) - 1}1"
+                 
+                abs_location = os.path.join(variables[0], f'{filename}_sentence.txt')
+                output = open(abs_location, 'w')
+                output.write(binary_contents)
+            
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")
     sys.exit(error)
