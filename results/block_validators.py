@@ -89,6 +89,7 @@ def run_all_validators(proposed_segmentation=None, true_segmentation=None, batch
 
         export_format = f"windowdiff,windowpr,beefermans,basicmetric_pre, basicmetric_rec, basicmetric_acc,\n{window_diff_},{window_pr_},{beefermans_},{basic_metric_p}, {basic_metric_r}, {basic_metric_a}"
         print (export_format)
+
         if export and not export_location:
             sys.exit("ERROR: please specify an exportable location.")
         elif export and export_location:
@@ -96,6 +97,7 @@ def run_all_validators(proposed_segmentation=None, true_segmentation=None, batch
             write_to.write(export_format)
             write_to.close()
         
+        return {"window_diff_":window_diff_, "window_pr_":window_pr_, "beefermans_":beefermans_, "basic_metric":(basic_metric_p, basic_metric_r, basic_metric_a)}
 
     elif batch and translated_data_file:
         pass

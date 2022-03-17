@@ -21,7 +21,7 @@ args = sys.argv
 print(args)
 
 functions = ['slseg', 'rs3parse', 'rs3trainingdata',
-    'rs3originaltext', 'validateboundaries', 'clauseparse']
+    'rs3originaltext', 'validateboundaries', 'clauseparse', 'generatedsmall']
 function_called = args[1]
 location = args[2]
 variables = args[3:7]
@@ -66,7 +66,8 @@ try:
                     rs3parser.RS3_generate_fis_training_data(tile, split, abs_location, variables[0], str(
                         number_of_docs_to_parse_index), int(variables[2]), parse_type=variables[3])
                     print(f'{bcolors.WARNING}FINISHED PARSING... {variables}')
-
+                    script = "osascript -e 'tell application \"Messages\" to send \"FuzzySeg has finished creating training data.\" to buddy \"07948171108\"'"
+                    os.system(script)
                 except Exception as e:
                     print(f'{bcolors.FAIL}Failed to parse {variables}, {e}')
                     continue
@@ -148,18 +149,68 @@ try:
             filename = filename[0]
 
             if file_extension in ['txt', 'rs3']:
+                print(f'{bcolors.OKCYAN}Loading raw text file {segfile}...')
+                
                 file_contents = open(abs_location, "r").read()
-                clause_markers = [',', '.', ';', ':']
+                clause_markers = [',', '.',]
                 for marker in clause_markers:
                     file_contents = file_contents.replace(marker, '|')
+                file_contents = file_contents.replace('  ', ' ')
+                
                 file_contents = file_contents.split('|')
                 binary_contents = '1'
                 for segments in file_contents:
-                    binary_contents += f"{'0'*len(segments.split(' ')) - 1}1"
-                 
+                    binary_contents += f"{'0'*(len(segments.split(' ')) - 1)}1"
+                
+                binary_contents = binary_contents[:-1]
+                
                 abs_location = os.path.join(variables[0], f'{filename}_sentence.txt')
                 output = open(abs_location, 'w')
                 output.write(binary_contents)
+                print(f'{bcolors.OKCYAN}Finished parsing {segfile}...')
+    elif function_called == functions[6]:
+        import re, math
+        max_block_size = int(variables[1])
+
+        for segfile in list_path:
+            block_counter = 0
+            current_line = 0
+            abs_location = os.path.join(location, segfile)
+            filename = segfile.split('.')
+            file_extension = filename[1]
+            filename = filename[0]
+
+            if file_extension in ['txt', 'rs3']:
+                print(f'{bcolors.OKCYAN}Loading RST file {segfile}...')
+                file_contents = open(abs_location, "r").read()
+                file_contents = re.sub('<[^>]*>', '', file_contents)
+                file_lines = file_contents.split('\n')
+                file_lines = [f.strip() for f in file_lines]
+                total_blocks = math.ceil(len(file_lines)/max_block_size)
+                file_blocks = {i:[] for i in range(total_blocks)}
+
+                for i in range(len(file_lines)):
+                    if current_line == max_block_size:
+                        block_counter += 1
+                        current_line = 0
+                    file_blocks[block_counter].append(file_lines[i])
+                    current_line += 1
+                
+                print (file_blocks)
+
+                for block in file_blocks:
+                    print (f'{bcolors.OKCYAN}Processing part{block} of {filename}')
+                    new_sub_file_data = file_blocks[block]
+                    new_sub_file = os.path.join(variables[0], f'{filename}_part{block}.txt')
+                    new_sub_file = open(new_sub_file, 'w')
+                    line_data = ''
+                    for line in new_sub_file_data:
+                        if line !='':
+                            line_data += f'<segment>{line}</segment>\n'
+                    new_sub_file_text = f'<rst>\n<body>\n{line_data}</body>\n</rst>\n'
+                    new_sub_file.write(new_sub_file_text)
+                    print (f'{bcolors.OKCYAN}Finished Processing part{block} of {filename}')
+    
             
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")

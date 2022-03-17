@@ -1,5 +1,9 @@
-function [calculated_boundaries, reference_boundaries] = run(fuzzy_system, input_test_data)
-    test_data = load(input_test_data);
+function [calculated_boundaries, reference_boundaries] = run(fuzzy_system, input_test_data, kfold)
+    if kfold == false
+        test_data = load(input_test_data);
+    else
+        test_data = input_test_data
+        
     validation_data = test_data(:, 1); 
     test_input = test_data(:, 2:4);
     val_output = double.empty(0);

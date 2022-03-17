@@ -55,4 +55,10 @@ python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_dat
 python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k5_char.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k5_char.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_2_k5_char.dat"}'
 
 python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/syntax/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/syntax/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/syntax/train_2_k3.dat"}'
+
+# KFOLD STUFF
+python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/generated/train_11_k3_syntax.dat" '{"training_data_path":"phd_datasets/fuzzyseg_outputs/fis_training/generated/train_11_k3_syntax.dat", "test_data_path":"phd_datasets/fuzzyseg_outputs/fis_training/generated/test/train_12_k3_syntax.dat", "kfold":10}'
+# END KFOLD
+
+python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/academic/5050split/train_50_k3_syntax.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/academic/5050split/train_50_k3_syntax.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/academic/5050split/test_50_k3_syntax.dat"}'
 ```
