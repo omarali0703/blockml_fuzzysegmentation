@@ -22,3 +22,6 @@ function [calculated_boundaries, reference_boundaries] = run(fuzzy_system, input
     calculated_boundaries = output_boundaries;
     reference_boundaries = val_output;
 end
+
+function [edus] = run_and_get_edus(fuzzy_system, input_test_data):
+end

@@ -23,7 +23,7 @@ python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset
 python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50
 ```
 
-Run on smaller set that is used by Fuzzy Seg.
+> Run on smaller set that is used by Fuzzy Seg.
 ```bash
 python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50
 ```
@@ -33,9 +33,17 @@ python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets
 python3 run_segbot.py '../phd_datasets/gum_outputs/original_gum_text' '../phd_datasets/segbot_outputs/gum' 
 ```
 
+### Running HILDA to generate the segmentations.
+
+> Running hilda to get the segmentations
+
+```bash
+python3 hilda.py -s texts/bbc_20081227.txt
+```
+
 ### Training and running fuzzy segmentation 
 
-This will run all of them in a file and produce outputs.
+> This will run all of them in a file and produce outputs.
 
 ```bash
 python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fis_training/" '{"none":"none"}'

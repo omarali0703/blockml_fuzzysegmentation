@@ -99,3 +99,8 @@ python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/sm
 ```bash
 python3 micro_logic.py generatedsmall "dependencies/phd_datasets/gum_dataset/large_sample" "dependencies/phd_datasets/gum_dataset/small_sample/generated" 30
 ```
+
+## HILDA Workflow
+
+1. Convert fuzzyseg outputs into hilda inputs.
+2. Run hilda with new command that takes the fuzzyseg inputs and uses them instead of the segmenter.
