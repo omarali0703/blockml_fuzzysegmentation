@@ -8,28 +8,28 @@
 ## Example commands I use
 
 ### Example of running syntax-parse training for fuzzy system
-```bash
+```bsh
 python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset_inputs syntax
 ```
 
 
 ### Example of running dependency-parse training for fuzzy system
-```bash
+```bsh
 python3 mlflow.py run fuzzy_segmentation preprocess_fis phd_datasets/raw_dataset_inputs dependency
 ```
 
 ### Running SLSeg
-```bash
+```bsh
 python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50
 ```
 
 > Run on smaller set that is used by Fuzzy Seg.
-```bash
+```bsh
 python3 run_all.py ../phd_datasets/gum_outputs/original_gum_text ../phd_datasets/slseg_outputs/gum ./parser05Aug16 -T50
 ```
 
 ### Running Segbot (GUM Dataset)
-```bash
+```bsh
 python3 run_segbot.py '../phd_datasets/gum_outputs/original_gum_text' '../phd_datasets/segbot_outputs/gum' 
 ```
 
@@ -37,27 +37,27 @@ python3 run_segbot.py '../phd_datasets/gum_outputs/original_gum_text' '../phd_da
 
 > Running hilda to get the segmentations
 
-```bash
+```bsh
 python3 hilda.py -s texts/bbc_20081227.txt
 ```
 
 ### Training and running fuzzy segmentation 
 
-> This will run all of them in a file and produce outputs.
+> This will run all of them in a file and produce outputs --> This is specifically to return results (using kfold) for the original analysis of the model. This doesn't actually take in a file and segment it. That is below.
 
-```bash
+```bsh
 python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fis_training/" '{"none":"none"}'
 ```
 
 This will only run using the one dataset. We only want to train once in this instance.
 
-```bash
+```bsh
 python3 mlflow.py run fuzzy_segmentation train "phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_0-1_k3.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/train_2_k3.dat"}'
 ```
 
 Run the run + validation flow
 
-```bash
+```bsh
 python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k3_char.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k3_char.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_2_k3_char.dat"}'
 
 python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k5_char.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_0-1_k5_char.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/charniak/train_2_k5_char.dat"}'
@@ -69,4 +69,20 @@ python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "../depe
 # END KFOLD
 
 python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_datasets/fuzzyseg_outputs/fis_training/academic/5050split/train_50_k3_syntax.dat" '{"training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/academic/5050split/train_50_k3_syntax.dat", "test_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/academic/5050split/test_50_k3_syntax.dat"}'
+```
+
+
+### Running FuzzySeg as a Segmenter
+
+> To run FuzzySeg as a standalone piece. This process takes in a file + training data and returns a list of segments in HILDA or array format for use in subsequent RST or text summ. models. 
+
+
+```bsh
+python3 mlflow.py run fuzzy_segmentation run "phd_datasets/fuzzyseg_inputs/001a.txt" 
+'{
+    "training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/generated/train_12_k3_syntax.dat",
+    "output_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/gum",
+    "parse_type":"syntax"
+}'
+
 ```

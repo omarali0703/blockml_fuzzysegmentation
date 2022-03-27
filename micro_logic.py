@@ -2,6 +2,8 @@ import sys
 import os
 from python_micrologic import RS3_Parser as rs3parser
 from python_micrologic import SLSeg_Parser as slsegparser
+from python_micrologic import SentiWordNet_Parser as sentparser
+
 from xml.etree.ElementTree import ParseError
 
 
@@ -21,7 +23,7 @@ args = sys.argv
 print(args)
 
 functions = ['slseg', 'rs3parse', 'rs3trainingdata',
-    'rs3originaltext', 'validateboundaries', 'clauseparse', 'generatedsmall']
+             'rs3originaltext', 'validateboundaries', 'clauseparse', 'generatedsmall', 'sentimentcasestudy']
 function_called = args[1]
 location = args[2]
 variables = args[3:7]
@@ -96,9 +98,10 @@ try:
             if file_extension in ['txt', 'rs3']:
                 file_contents = open(abs_location, "r").read()
                 ref_comp_pairs[filename] = [file_contents]
-        print (f"Computed boundaries loaded...\n{ref_comp_pairs}")
+        print(f"Computed boundaries loaded...\n{ref_comp_pairs}")
 
-        print(f'{bcolors.OKCYAN}Loading calculated boundaries from {variables[0]}...')
+        print(
+            f'{bcolors.OKCYAN}Loading calculated boundaries from {variables[0]}...')
         list_path = os.listdir(variables[0])
         for segfile in list_path:
             abs_location = os.path.join(variables[0], segfile)
@@ -117,30 +120,34 @@ try:
         win_diff = 0
         win_pr = 0, 0, 0
         basic_met = 0, 0, 0
-        print (ref_comp_pairs)
+        print(ref_comp_pairs)
         total_compares = 0
         for boundary_pairs in ref_comp_pairs:
             pairs = ref_comp_pairs[boundary_pairs]
             if len(pairs) <= 1:
-                continue 
+                continue
             reference_pair = pairs[0]
             calculated_pair = pairs[1]
-            calc_win_diff = window_diff(reference_pair, calculated_pair, k=1, boundary="1")
-            calc_win_pr = window_pr(calculated_pair, reference_pair, boundary="1")
-            calc_basic_metric = basic_metric(calculated_pair, reference_pair, boundary="1")
+            calc_win_diff = window_diff(
+                reference_pair, calculated_pair, k=1, boundary="1")
+            calc_win_pr = window_pr(
+                calculated_pair, reference_pair, boundary="1")
+            calc_basic_metric = basic_metric(
+                calculated_pair, reference_pair, boundary="1")
             print(calc_win_diff, calc_win_pr, calc_basic_metric)
             total_compares += 1
             win_diff += calc_win_diff
             win_pr = tuple(map(lambda i, j: i+j, basic_met, calc_win_pr))
-            basic_met = tuple(map(lambda i, j: i+j, basic_met, calc_basic_metric))
-        
+            basic_met = tuple(
+                map(lambda i, j: i+j, basic_met, calc_basic_metric))
+
         win_pr = tuple(map(lambda i: i/total_compares, win_pr))
         basic_met = tuple(map(lambda i: i/total_compares, basic_met))
         win_diff = win_diff/total_compares
 
-        print (f"{bcolors.OKGREEN}Window Diff: {win_diff}")
-        print (f"{bcolors.OKGREEN}Basic Metric: {basic_met}")
-        print (f"{bcolors.OKGREEN}Window PR: {win_pr}")
+        print(f"{bcolors.OKGREEN}Window Diff: {win_diff}")
+        print(f"{bcolors.OKGREEN}Basic Metric: {basic_met}")
+        print(f"{bcolors.OKGREEN}Window PR: {win_pr}")
     elif function_called == functions[5]:
         for segfile in list_path:
             abs_location = os.path.join(location, segfile)
@@ -150,26 +157,28 @@ try:
 
             if file_extension in ['txt', 'rs3']:
                 print(f'{bcolors.OKCYAN}Loading raw text file {segfile}...')
-                
+
                 file_contents = open(abs_location, "r").read()
-                clause_markers = [',', '.',]
+                clause_markers = [',', '.', ]
                 for marker in clause_markers:
                     file_contents = file_contents.replace(marker, '|')
                 file_contents = file_contents.replace('  ', ' ')
-                
+
                 file_contents = file_contents.split('|')
                 binary_contents = '1'
                 for segments in file_contents:
                     binary_contents += f"{'0'*(len(segments.split(' ')) - 1)}1"
-                
+
                 binary_contents = binary_contents[:-1]
-                
-                abs_location = os.path.join(variables[0], f'{filename}_sentence.txt')
+
+                abs_location = os.path.join(
+                    variables[0], f'{filename}_sentence.txt')
                 output = open(abs_location, 'w')
                 output.write(binary_contents)
                 print(f'{bcolors.OKCYAN}Finished parsing {segfile}...')
     elif function_called == functions[6]:
-        import re, math
+        import re
+        import math
         max_block_size = int(variables[1])
 
         for segfile in list_path:
@@ -187,7 +196,7 @@ try:
                 file_lines = file_contents.split('\n')
                 file_lines = [f.strip() for f in file_lines]
                 total_blocks = math.ceil(len(file_lines)/max_block_size)
-                file_blocks = {i:[] for i in range(total_blocks)}
+                file_blocks = {i: [] for i in range(total_blocks)}
 
                 for i in range(len(file_lines)):
                     if current_line == max_block_size:
@@ -195,26 +204,41 @@ try:
                         current_line = 0
                     file_blocks[block_counter].append(file_lines[i])
                     current_line += 1
-                
-                print (file_blocks)
+
+                print(file_blocks)
 
                 for block in file_blocks:
-                    print (f'{bcolors.OKCYAN}Processing part{block} of {filename}')
+                    print(f'{bcolors.OKCYAN}Processing part{block} of {filename}')
                     new_sub_file_data = file_blocks[block]
-                    new_sub_file = os.path.join(variables[0], f'{filename}_part{block}.txt')
+                    new_sub_file = os.path.join(
+                        variables[0], f'{filename}_part{block}.txt')
                     new_sub_file = open(new_sub_file, 'w')
                     line_data = ''
                     for line in new_sub_file_data:
-                        if line !='':
+                        if line != '':
                             line_data += f'<segment>{line}</segment>\n'
                     new_sub_file_text = f'<rst>\n<body>\n{line_data}</body>\n</rst>\n'
                     new_sub_file.write(new_sub_file_text)
-                    print (f'{bcolors.OKCYAN}Finished Processing part{block} of {filename}')
-    
-            
+                    print(
+                        f'{bcolors.OKCYAN}Finished Processing part{block} of {filename}')
+    elif function_called == functions[7]:
+        for segfile in list_path:
+            block_counter = 0
+            current_line = 0
+            abs_location = os.path.join(location, segfile)
+            filename = segfile.split('.')
+            file_extension = filename[1]
+            filename = filename[0]
+
+            if file_extension in ['txt', 'rs3']:
+                print(f'{bcolors.OKCYAN}Loading RST file {segfile}...')
+                file_contents = open(abs_location, "r").read()
+
+                
+
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")
     sys.exit(error)
 except ParseError as error:
-    print (f"{bcolors.FAIL}Error parsing: {error}")
+    print(f"{bcolors.FAIL}Error parsing: {error}")
     pass

@@ -100,6 +100,11 @@ python3 micro_logic.py rs3trainingdata "dependencies/phd_datasets/gum_dataset/sm
 python3 micro_logic.py generatedsmall "dependencies/phd_datasets/gum_dataset/large_sample" "dependencies/phd_datasets/gum_dataset/small_sample/generated" 30
 ```
 
+## Sentiment Analysis Workflow
+
+```bash
+python3 micro_logic.py sentimentcasestudy "input_doc" "parse_type = fuzzy, baseline, hilda"
+```
 ## HILDA Workflow
 
 1. Convert fuzzyseg outputs into hilda inputs.
