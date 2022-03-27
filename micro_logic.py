@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 from python_micrologic import RS3_Parser as rs3parser
 from python_micrologic import SLSeg_Parser as slsegparser
 from python_micrologic import SentiWordNet_Parser as sentparser
@@ -222,6 +223,10 @@ try:
                     print(
                         f'{bcolors.OKCYAN}Finished Processing part{block} of {filename}')
     elif function_called == functions[7]:
+        pre = 0 
+        rec = 0
+        f1 = 0
+        file_counter = 0
         for segfile in list_path:
             block_counter = 0
             current_line = 0
@@ -230,11 +235,39 @@ try:
             file_extension = filename[1]
             filename = filename[0]
 
-            if file_extension in ['txt', 'rs3']:
-                print(f'{bcolors.OKCYAN}Loading RST file {segfile}...')
+            if file_extension in ['json']:
+                print(f'{bcolors.OKCYAN}Loading JSON file {segfile}...')
                 file_contents = open(abs_location, "r").read()
-
+                sentiment_data = json.loads(file_contents)
+                FP=0
+                FN=0
+                TP=0
+                TN=0
+                for review in sentiment_data:
+                    review_sentence = review['reviewText']
+                    review_reference_score = 1 if float(review['overall']) >= 2.5 else 0
+                    output = sentparser.parse_sentence(review_sentence, rst=False,)
+                    print (review_reference_score, output)
+                    if output == 1 and review_reference_score == 1:
+                        TP += 1
+                    if output == 1 and review_reference_score == 0:
+                        FP += 1
+                    if output == 0 and review_reference_score == 0:
+                        TN += 1
+                    if output == 0 and review_reference_score == 1:
+                        FN += 1
                 
+                pre += TP/(TP+FP)
+                rec += TP/(TP+FN)
+                f1  += 2 * (pre*rec)/(pre+rec)
+            
+            file_counter += 1
+
+        pre = pre / file_counter      
+        rec = rec / file_counter      
+        f1 = f1 / file_counter      
+
+        print (f"Precision: {pre}, Recall: {rec}, F1: {f1}")
 
 except OSError as error:
     print(f"{bcolors.FAIL}Error parsing: {error}")

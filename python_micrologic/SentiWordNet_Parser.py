@@ -3,10 +3,6 @@ from nltk.tag import pos_tag
 from nltk.corpus import sentiwordnet as swn
 from nltk.corpus import wordnet as wn
 import nltk
-nltk.download('sentiwordnet')
-nltk.download('wordnet')
-list(swn.senti_synsets('slow'))
-
 
 def penn_to_wn(tag):
     """
@@ -47,8 +43,14 @@ def parse_sentence(sentence, rst=False):
         # Take the first sense, the most common
         synset = synsets[0]
         swn_synset = swn.senti_synset(synset.name())
-        print(swn_synset)
+        # print(swn_synset)
 
         sentiment += swn_synset.pos_score() - swn_synset.neg_score()
         tokens_count += 1
-    print(sentiment)
+    print (sentiment/tokens_count)
+    if sentiment > 0.2:
+        return 1
+    elif sentiment < -0.2:
+        return 0
+    # return 1 if (sentiment>0.5) else 0
+    # return sentiment

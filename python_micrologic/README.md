@@ -103,7 +103,7 @@ python3 micro_logic.py generatedsmall "dependencies/phd_datasets/gum_dataset/lar
 ## Sentiment Analysis Workflow
 
 ```bash
-python3 micro_logic.py sentimentcasestudy "input_doc" "parse_type = fuzzy, baseline, hilda"
+python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 
 ```
 ## HILDA Workflow
 
