@@ -3,6 +3,8 @@ from . import block_text_tilling as tt
 import os
 from nltk.tokenize import word_tokenize
 import xml.etree.ElementTree as ET
+import matlab.engine
+eng = matlab.engine.start_matlab()
 
 segEx = '''<T>
 <P>
@@ -168,7 +170,7 @@ def obtain_boundary_objects(fis, text, segs,gum=False, slseg=False, k=3, get_bou
         boundary_raw = new_convert_slseg_2_fb(temp_seg_ex, indexed_list=True)
     # boundary_objects = tt.tile(tree, processed_leaves, k, get_boundary=False, )
     # TODO HERE IS WHERE THE ISSUE IS WITH THE 343 instances as opposed to 49/50
-    boundary_objects, validate, output = tt.tile(fis,
+    boundary_objects, validate, output = tt.tile(eng, fis,
                                tree_list, processed_leaves, k, get_boundary=get_boundary, )
     boundary_index = 0
     print(len(boundary_objects))

@@ -129,6 +129,8 @@ def get_original_text(location=None, write_to_file=None, called_from_micrologic=
 
 # --------------------- END
 
+import matlab.engine
+eng = matlab.engine.start_matlab()
 
 def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, output_location=None, index='0', k_size=3, parse_type='syntax'):
     # print(segmented_data)
@@ -141,7 +143,7 @@ def RS3_generate_fis_training_data(tile_func, split_func, segmented_data=None, o
         bar.next()
         true_boundaries = parse_rs3(segmented_data, bin=True, output_location=None) #Get the bin representation of the boundaries from the rs3 files.
         bar.next()
-        boundaries, validate, tiled_data = tile_func(None, tree, processed_leaves, k_size, get_boundary=True, true_boundaries=true_boundaries)
+        boundaries, validate, tiled_data = tile_func(eng, None, tree, processed_leaves, k_size, get_boundary=True, true_boundaries=true_boundaries)
         
         # GET THE ABS LOCATION FOR THIS]
         print(f'Beginning outputs to bin file {output_location}')

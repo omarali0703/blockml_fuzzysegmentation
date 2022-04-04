@@ -102,9 +102,16 @@ python3 micro_logic.py generatedsmall "dependencies/phd_datasets/gum_dataset/lar
 
 ## Sentiment Analysis Workflow
 
+> run for the review-musical-instruments data
 ```bash
-python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 
+python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 1 5
 ```
+
+> Run for pang-lee data
+```bash
+python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 1 10
+```
+
 ## HILDA Workflow
 
 1. Convert fuzzyseg outputs into hilda inputs.

@@ -41,7 +41,7 @@ def start(input_data=None, settings={}):
         if kfold:
             kfold_value = kfold
 
-            kfold = KFold(kfold, True, 1)
+            kfold = KFold(n_splits=kfold, shuffle=True, random_state=1)
             localised_dir = os.path.join(settings['root'], settings['training_data_path'])
             # print (localised_dir)
             data = open(localised_dir, 'r').read()
@@ -61,8 +61,8 @@ def start(input_data=None, settings={}):
                 fuzzy_system = eng.train(kfold_training_data, True)
                 bar.next()
                 fold_calculated_boundaries, fold_ref_boundaries = eng.run(fuzzy_system, kfold_test_data, True, nargout=2)
-                fold_calculated_boundaries = list(np.asarray(fold_calculated_boundaries[0]))
-                fold_ref_boundaries = list(np.asarray(fold_ref_boundaries[0]))
+                fold_calculated_boundaries = np.asarray(fold_calculated_boundaries[0]).tolist()[0]
+                fold_ref_boundaries = np.asarray(fold_ref_boundaries[0]).tolist()[0]
                 
                 calculated_boundaries.append(fold_calculated_boundaries)
                 ref_boundaries.append(fold_ref_boundaries)
@@ -71,8 +71,8 @@ def start(input_data=None, settings={}):
             fuzzy_system = eng.train(settings['training_data_path'], False)
 
             calculated_boundaries, ref_boundaries = eng.run(fuzzy_system, settings['test_data_path'], False, nargout=2)
-            calculated_boundaries = list(np.asarray(calculated_boundaries[0]))
-            ref_boundaries = list(np.asarray(ref_boundaries[0]))
+            calculated_boundaries = np.asarray(calculated_boundaries[0]).tolist()
+            ref_boundaries = np.asarray(ref_boundaries[0]).tolist()
 
            
         bar.next()
@@ -80,9 +80,12 @@ def start(input_data=None, settings={}):
         fuzzy_thresh = 0.622
 
         if kfold:
+            print (calculated_boundaries, len(calculated_boundaries))
             for calc_boundary_set in calculated_boundaries:
                 index = 0
+                # print (calc_boundary_set)
                 for calc_boundary in calc_boundary_set:
+                    # print (calc_boundary)
                     if calc_boundary > fuzzy_thresh:
                         calc_boundary_set[index] = 1
                     else:

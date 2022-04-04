@@ -47,7 +47,6 @@ def compare_leaves_AVG(sentence, leaves):
 
 #  Only load this shit once
 model_dir = find('models/bllip_wsj_no_aux').path
-charn_parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser
 
 parser = stanford.StanfordParser(path_to_jar=filename+'stanford-corenlp-4.2.0-sources.jar',
                                  path_to_models_jar=filename+'stanford-corenlp-4.2.0-models.jar', java_options='-mx8G', )
@@ -78,9 +77,10 @@ def generate_parse_tree(input_str, show=True, parse_type='syntax'):
         # nlp.add_pipe("parser", config=config)
         # sentences = [to_nltk_tree(sent.root) for sent in spacy_dep_tree.sents]
     elif parse_type == 'char':
+        charn_parser = bllip.BllipParser.from_unified_model_dir(model_dir) #charniak parser
 
-       sentences = charn_parser.parse_one(input_str)
-       print(sentences)
+        sentences = charn_parser.parse_one(input_str)
+        print(sentences)
     else:
         sys.exit("Please specify a valid parsing technique to run Fuzzy Seg")
 

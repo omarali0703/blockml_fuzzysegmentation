@@ -14,7 +14,7 @@ dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, '../visualiser/')
 lemmatizer = WordNetLemmatizer()
 stemmer = PorterStemmer()
-eng = matlab.engine.start_matlab()
+# eng = matlab.engine.start_matlab()
 example_1 = "Whilst I dont like chinese food, it was safe to say that its nice"
 example_1_ref = '1000000000001000000000010000000000010000000000000100000000100000000001'
 example_2 = 'This is just a test. Although it does not really matter'
@@ -41,7 +41,7 @@ class bcolors:
 
 
 def split(string, show=True, parse_type='syntax'):  # J is the context range (j either side)
-    print(f'{bcolors.OKCYAN}Begin splitting ...')
+    print(f'{bcolors.OKCYAN}Begin splitting ... {string}')
     processed_leaves = []
     trees = syntax_parser.generate_parse_tree(string, show, parse_type=parse_type)
     tree_list = []
@@ -69,7 +69,7 @@ def compare_words(tree, word_i, word_j):
 def compare_words_AVG(tree, words):
     for word in words:
         if word[0] == "NULL" or word[0] == "None":
-            print("is null")
+            # print("is null")
 
             return 0
 
@@ -89,20 +89,22 @@ def internal_cohesion(tree, word_type, splice_i):
 
 
 # This needs to take the generated FIS as an input.
-def calculate_boundary(fis, int_coh_i, int_coh_j, ext_dis):
-    print(
-        f"INT_COH_I: {int_coh_i}, INT_COH_J: {int_coh_j}, EXT_DIS: {ext_dis}")
+def calculate_boundary(eng, fis, int_coh_i, int_coh_j, ext_dis):
+    # print(
+    #     f"fis: {fis}, INT_COH_I: {int_coh_i}, INT_COH_J: {int_coh_j}, EXT_DIS: {ext_dis}")
+    # # eng.cd('/Users/omarali/Documents/mlflow_source/mlflow_projects/fuzzy_segmentation/train')
     place_boundary = eng.fis(fis, int_coh_i, int_coh_j, ext_dis)
     return place_boundary, float(place_boundary) >= 0.6
 
 
 # True boundaries are a bin rep of the input data.
 # If provided then these are used if get_boundary is true.
-def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None):
+def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None):
     print(f'{bcolors.OKCYAN}Begin tilling ...')
 
     boundaries = ''
-    print(len(string_arr))
+    # print(len(string_arr))
+    print (tree_list, len(tree_list))
     string_arr_len = len(string_arr)
     boundary_objects = []
     for tree in tree_list:
@@ -123,7 +125,7 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
                 left_string_array = left_pad + left_string_array
                 print('2')
             right_pad = abs(k - len(right_string_array))
-            print (k, len(right_string_array))
+            # print (k, len(right_string_array))
             if right_pad > 0:
                 right_pad = [PAD_CHAR for pad in range(right_pad)]
                 right_string_array += right_pad
@@ -146,15 +148,16 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
 
             if get_boundary:
                 if not true_boundaries:
+                    # print (left_string_array, right_string_array)
                     boundary_score, is_boundary = calculate_boundary(
-                        fis, left_internal_coh, right_internal_coh, external_dissim)
+                        eng, fis, left_internal_coh, right_internal_coh, external_dissim)
                     if is_boundary:
                         boundaries += '1'
                     else:
                         boundaries += '0'
 
-                        output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
-                            boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
+                    output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
+                        boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
                 else:
                     # Get the boundaries from a bin rep of the training data.
                     print(i, len(true_boundaries))
@@ -173,12 +176,17 @@ def tile(fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None)
     print(f'{bcolors.OKGREEN}Finished tilling process..... (So close :D!)')
 
     if get_boundary:
-        validate = validator.window_diff(example_1_ref, boundaries, 3)
         output_to_file['boundaries']['computed'] = boundaries
-        output_to_file['boundaries']['reference'] = example_1_ref
-        output_to_file['boundaries']['windowdiff'] = validate
+        if true_boundaries:
+            validate = validator.window_diff(example_1_ref, boundaries, 3)
+            output_to_file['boundaries']['reference'] = example_1_ref
+            output_to_file['boundaries']['windowdiff'] = validate
         f.write(json.dumps(output_to_file))
-        return boundaries, validate, output_to_file
+        
+        if true_boundaries:
+            return boundaries, validate, output_to_file
+        else:
+            return boundaries, output_to_file
     else:
         return boundary_objects
 

@@ -78,11 +78,11 @@ python3 mlflow.py run-flow fuzzy_segmentation train-and-run-flow-syntax "phd_dat
 
 
 ```bsh
-python3 mlflow.py run fuzzy_segmentation run "phd_datasets/fuzzyseg_inputs/001a.txt" 
-'{
-    "training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/generated/train_12_k3_syntax.dat",
-    "output_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/gum",
-    "parse_type":"syntax"
+python3 mlflow.py run fuzzy_segmentation run "phd_datasets/fuzzyseg_inputs/001a.txt" '{
+    "training_data_path":"/phd_datasets/fuzzyseg_outputs/fis_training/generated/train_12_k3_syntax.dat", 
+    "output_data_path":"/phd_datasets/fuzzyseg_outputs/gum",
+    "parse_type":"syntax",
+    "parser_output_form":"hilda"
 }'
 
 ```

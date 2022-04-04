@@ -1,10 +1,10 @@
 function trained = train(training_data_path, kfold)
+      
     if kfold == false
         fcmdata = load(training_data_path);
     else
         fcmdata = training_data_path;
-        
-        
+    
     outputdata = fcmdata(:,1);
     inputdata = fcmdata(:,2:4);
     options = [3.0 NaN NaN 0];
@@ -27,5 +27,3 @@ function trained = train(training_data_path, kfold)
     fisT2 = convertToType2(fis);
     trained = fisT2;
 end
-
-

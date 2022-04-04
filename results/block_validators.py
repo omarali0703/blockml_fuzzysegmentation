@@ -73,7 +73,11 @@ def basic_metric(proposed_segmentation, true_segmentation, boundary=1):
 
 
 def run_all_validators(proposed_segmentation=None, true_segmentation=None, batch=False, translated_data_file=None, export=False, export_location=None):
-   
+    proposed_segmentation[0] = 1
+    proposed_segmentation[-1] = 1
+    true_segmentation[0] = 1
+    true_segmentation[-1] = 1
+    
     if batch and not translated_data_file:
         sys.exit("ERROR: Make sure a translated set of data is generated before running in batch mode.")
 
@@ -82,6 +86,9 @@ def run_all_validators(proposed_segmentation=None, true_segmentation=None, batch
     
     elif not batch and (proposed_segmentation and true_segmentation):
         # Run is singular mode
+        # We can always gaurantee a bound at the beginning and end. This will cause a false sense of failure if we dont include these in ours.
+        
+
         window_diff_ =   window_diff   (proposed_segmentation, true_segmentation, k=1)
         window_pr_ =     window_pr    (proposed_segmentation, true_segmentation, k=3)
         beefermans_ =    beefermans   (proposed_segmentation, true_segmentation)
