@@ -1,10 +1,11 @@
+from subprocess import Popen, PIPE
 import sys
 import os
 import json
 from tkinter.tix import Y_REGION
 from python_micrologic import RS3_Parser as rs3parser
 from python_micrologic import SLSeg_Parser as slsegparser
-from python_micrologic import SentiWordNet_Parser as sentparser
+from python_micrologic import RSTSentiment_Parser as sentparser
 from sklearn import metrics
 from xml.etree.ElementTree import ParseError
 
@@ -225,7 +226,7 @@ try:
                         f'{bcolors.OKCYAN}Finished Processing part{block} of {filename}')
     elif function_called == functions[7]:
         file_counter = 0
-        limit = 6000
+        limit = 60
         l_counter = 0
         for segfile in list_path:
         
@@ -242,12 +243,51 @@ try:
                 print(f'{bcolors.OKCYAN}Loading JSON file {segfile}...{variables}')
                 file_contents = open(abs_location, "r").read()
                 sentiment_data = json.loads(file_contents)
+
+                sentiment_score_is_out_of = int(variables[0])
+                is_rst = variables[1] = True if variables[1] == "True" else False
+                if is_rst:
+                    print (f"{bcolors.OKGREEN}Loading RST files into docker img...")
+                    for review in sentiment_data:
+                        if l_counter == limit:
+                            break
+                        file_name = f'input_{l_counter}.txt'
+                        
+                        tmp_sentiment_file = open(f"dependencies/hilda-docker/{file_name}", "w")
+                        tmp_sentiment_file.write(review['reviewText'])
+                        print (f"{file_name} Loaded...")
+
+                        l_counter += 1
+                    print (f"{bcolors.OKGREEN}Building docker image... {__file__}")
+                    curr_dir = os.path.dirname(__file__)
+                    docker_location = curr_dir + "/dependencies/hilda-docker"
+                    print (docker_location)
+
+                    p = Popen(f'docker build -t hilda {docker_location}', stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+                    outputs, err = p.communicate()
+                    # print (outputs)
+                    print (f"{bcolors.OKGREEN}Image built. {outputs} {err} \n\nRunning parser...")
+
+
+                l_counter = 0
+                pass # TODO pass RST files into docker img and build. Once built, return list of files that are inputs to HILDA. Run HILDA on these files and return RST trees.
                 for review in sentiment_data:
+                    
                     if l_counter == limit:
                         break
                     review_sentence = review['reviewText']
                     review_reference_score = 1 if int(float(review['overall'])) > 2 else 0
-                    computed = sentparser.parse_sentence_LESK(review_sentence, rst=False)
+                    rst_tree = None
+                    print (f"{bcolors.OKGREEN}Parsing input_{l_counter}.txt...")
+
+                    if is_rst:
+                        # we need to open a tmp file so we can input its location into the HILDA wrapper. 
+                        # This is a work around as i don't fancy updating the HILDa wrapper code and i'm lazy.
+                        rst_tree = sentparser.get_rst_tree(f"input_{l_counter}.txt")
+                        print (rst_tree)
+                    print (f"{bcolors.OKGREEN}Finished parsing... Getting sentiment from input_{l_counter}.txt")
+                    
+                    computed = sentparser.parse_sentence_LESK(review_sentence, rst=is_rst, rst_tree=rst_tree)
                     if computed == None:
                         continue
                     output = 1 if computed > 0 else 0

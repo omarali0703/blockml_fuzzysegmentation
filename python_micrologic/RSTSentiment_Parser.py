@@ -5,6 +5,10 @@ from nltk.corpus import wordnet as wn
 import nltk
 from nltk import word_tokenize
 from nltk.wsd import lesk
+from subprocess import Popen, PIPE
+import os
+import docker
+
 def penn_to_wn(tag):
     """
     Convert between the PennTreebank tags to simple Wordnet tags
@@ -25,6 +29,17 @@ def penn_to_wn(tag):
 def map(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
  
+def get_rst_tree(input_dir):
+    file_name = input_dir
+    input_dir = os.path.dirname(os.path.dirname(__file__))
+    # input_dir = os.path.join(input_dir, '..')
+    input_dir = os.path.join(input_dir, f"dependencies/hilda-docker/{file_name}")
+    print (input_dir)
+   
+    cmd = f"docker run -v /tmp:/tmp -ti hilda {file_name}";
+    p = Popen(cmd.split(), stdout=PIPE, shell=False)
+    generated_tree, err = p.communicate()
+    print(generated_tree, err)
 
 def parse_sentence(sentence, rst=False):
     token = nltk.word_tokenize(sentence)
@@ -68,7 +83,7 @@ def parse_sentence(sentence, rst=False):
     # return sentiment
 
 
-def parse_sentence_LESK(sentence, rst=False, offset=2.7):
+def parse_sentence_LESK(sentence, rst=False, rst_tree=None):
     
     token = nltk.word_tokenize(sentence)
     after_tagging = nltk.pos_tag(token)

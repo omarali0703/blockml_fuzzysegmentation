@@ -102,17 +102,24 @@ python3 micro_logic.py generatedsmall "dependencies/phd_datasets/gum_dataset/lar
 
 ## Sentiment Analysis Workflow
 
-> run for the review-musical-instruments data
+> run for the review-musical-instruments data, the 5/10 means wbat the sentiment score is out of. 5 = 5* rating, and 10 is a rating out of 10 (obviously)
+> The Pang-lee set is out of 10, whilst the other is out of 5.
 ```bash
-python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 1 5
+python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 5 False
 ```
 
 > Run for pang-lee data
 ```bash
-python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 1 10
+python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 10 False
 ```
 
-## HILDA Workflow
+
+> Run for pang-lee data with RST weights
+```bash
+python3 micro_logic.py sentimentcasestudy "dependencies/phd_datasets/sentiment_data" 10 True
+```
+
+## HILDA Workflow (TODO)
 
 1. Convert fuzzyseg outputs into hilda inputs.
 2. Run hilda with new command that takes the fuzzyseg inputs and uses them instead of the segmenter.
