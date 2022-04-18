@@ -41,7 +41,7 @@ def start(input_data=None, settings={}):
         if kfold:
             kfold_value = kfold
 
-            kfold = KFold(n_splits=kfold, shuffle=True, random_state=1)
+            kfold = KFold(n_splits=kfold, shuffle=True, random_state=None)
             localised_dir = os.path.join(settings['root'], settings['training_data_path'])
             # print (localised_dir)
             data = open(localised_dir, 'r').read()
@@ -77,7 +77,7 @@ def start(input_data=None, settings={}):
            
         bar.next()
 
-        fuzzy_thresh = 0.622
+        fuzzy_thresh = 0.655
 
         if kfold:
             print (calculated_boundaries, len(calculated_boundaries))

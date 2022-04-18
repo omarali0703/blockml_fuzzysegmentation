@@ -66,12 +66,17 @@ def compare_words(tree, word_i, word_j):
 # Comparewords (Uses CompareLeavesAVG method) samples all leaves not just first and last.
 
 
-def compare_words_AVG(tree, words):
+def compare_words_AVG(tree, words, left=False):
     for word in words:
         if word[0] == "NULL" or word[0] == "None":
             # print("is null")
 
             return 0
+    
+    # if word[-1] == '.' and left:
+    #     return 1
+    # if word [0] == '.' and not left:
+    #     return 1
 
     sim = syntax_parser.compare_leaves_AVG(tree, words)
     # Words are now tuples ('They', 'PRP')
@@ -79,9 +84,9 @@ def compare_words_AVG(tree, words):
     return sim
 
 
-def internal_cohesion_AVG(tree, word_type, words):
+def internal_cohesion_AVG(tree, word_type, words, left=False):
     # print(splice_i[0], splice_i[len(splice_i)-1])
-    return compare_words_AVG(tree, words)
+    return compare_words_AVG(tree, words, left)
 
 
 def internal_cohesion(tree, word_type, splice_i):
@@ -89,13 +94,20 @@ def internal_cohesion(tree, word_type, splice_i):
 
 
 # This needs to take the generated FIS as an input.
-def calculate_boundary(eng, fis, int_coh_i, int_coh_j, ext_dis):
+def calculate_boundary(eng, fis, int_coh_i, int_coh_j, ext_dis, left_stop):
     # print(
     #     f"fis: {fis}, INT_COH_I: {int_coh_i}, INT_COH_J: {int_coh_j}, EXT_DIS: {ext_dis}")
     # # eng.cd('/Users/omarali/Documents/mlflow_source/mlflow_projects/fuzzy_segmentation/train')
     place_boundary = eng.fis(fis, int_coh_i, int_coh_j, ext_dis)
-    return place_boundary, float(place_boundary) >= 0.6
+    boundary = float(place_boundary) >= 0.6
 
+    # Left stop is the character that denotes a fullstop.
+    # If this is a fullstop, then we force a boundary.
+    stops = [',', '.']
+    if left_stop in stops:
+        boundary = True
+
+    return place_boundary, boundary
 
 # True boundaries are a bin rep of the input data.
 # If provided then these are used if get_boundary is true.
@@ -137,20 +149,21 @@ def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=
             #                  ||||||||
             # AVG method below VVVVVVVV
             left_internal_coh = internal_cohesion_AVG(
-                tree, 'inti', left_string_array)
+                tree, 'inti', left_string_array, left=True)
             right_internal_coh = internal_cohesion_AVG(
-                tree, 'intj', right_string_array)
+                tree, 'intj', right_string_array, left=False)
            
             # (print("calc exd", left_string_array, right_string_array,
             #        type(left_string_array), type(right_string_array)))
             external_dissim = compare_words_AVG(
-                tree, left_string_array + right_string_array)
+                tree, left_string_array + right_string_array, left=False)
 
+            left_stop = left_string_array[-1]
             if get_boundary:
                 if not true_boundaries:
                     # print (left_string_array, right_string_array)
                     boundary_score, is_boundary = calculate_boundary(
-                        eng, fis, left_internal_coh, right_internal_coh, external_dissim)
+                        eng, fis, left_internal_coh, right_internal_coh, external_dissim, left_stop[0])
                     if is_boundary:
                         boundaries += '1'
                     else:
