@@ -1,7 +1,7 @@
 from curses import curs_set
 import matlab.engine
 import matlab
-import os
+import os, re
 import json
 from os import listdir
 
@@ -24,11 +24,14 @@ class bcolors:
 
 
 eng = matlab.engine.start_matlab()
+# 100000000001000000000000000000000000000001000000000000000000000001000000000001
 
+test_str = '''These are not the greatest but they are cheap and they get to you fast when you need them. I have only had one fail and I have bought many of them to use in our broadcast studio. Amazon is the first place I go when I need cables for audio, video, computers or concert lighting. Good music to all!'''
 
 def fuzzy_segment(fuzzy_system, file_str, settings, split=None, tile=None):
     if split == None or tile==None:
         from ..preprocess_fis.block_text_tilling import tile as _tile, split as _split
+        # from block_text_tilling import tile as _tile, split as _split
 
     with Bar('Segmenting input source ...', max=7) as bar:
         
@@ -56,16 +59,18 @@ def fuzzy_segment(fuzzy_system, file_str, settings, split=None, tile=None):
         file_str = file_str.replace('%', f"{SPLIT_TOKEN}%")
         file_str = file_str.replace('$', f"${SPLIT_TOKEN}")
         file_str = file_str.replace(',', f"{SPLIT_TOKEN},")
-        file_str = file_str.replace(' ', f"{SPLIT_TOKEN}")
+        # file_str = file_str.replace(' ', f"{SPLIT_TOKEN}")
+        file_str = re.sub(r'\s+', f'{SPLIT_TOKEN}', file_str)
         file_str = file_str.replace('-', f"{SPLIT_TOKEN}")
         file_str = file_str.replace('.', f"{SPLIT_TOKEN}.")
         file_str = file_str.replace('`', f"{SPLIT_TOKEN}`")
         file_str = file_str.replace("'", f"{SPLIT_TOKEN}'")
+
         file_str_arr = file_str.split(SPLIT_TOKEN)
         
         
         print (file_str_arr, len(file_str_arr), len(boundaries))
-        index = 1
+        index = 0
 
         # HILDA STUFF
         edu_list = []
@@ -84,11 +89,17 @@ def fuzzy_segment(fuzzy_system, file_str, settings, split=None, tile=None):
         current_edu = []
         current_edu_cut = []
         cut_start = 0
-        cut_end = 0
+        cut_end = 1
         cut_tuple = ()
-        for boundary_token in boundaries[1:]:
-            
+        # boundaries = boundaries[1:]
+        print (boundaries)
+        # 10000000000100000000000000000000000000010000000000000000000000001000000000001
+        for boundary_token in boundaries:
+            # if file_str_arr[-1] != '.':
+            #     file_str_arr.append('.')
             if is_hilda:                
+                if int(boundary_token) == 1 and index == 0:
+                    continue
                 if int(boundary_token) == 1:
                     current_edu.append(file_str_arr[index])
                     edu_list.append(current_edu)
@@ -97,15 +108,17 @@ def fuzzy_segment(fuzzy_system, file_str, settings, split=None, tile=None):
                     cut_start = cut_end
                     current_edu_cut.append(cut_tuple)
 
-                    return_string += f"{file_str_arr[index]} </edu>\n"
-                    print(file_str_arr[index])
+                    return_string += f"{file_str_arr[index]}</edu>\n"
+                    # print(file_str_arr[index])
                     if file_str_arr[index] == '.':
                         print ('fullstop')
                         cut_start = 0
-                        cut_end = 0
+                        cut_end = 1
                         cuts_list.append(current_edu_cut)
                         current_edu_cut = []
-                    return_string += "<edu>" if is_hilda else "<edu>" # TODO make sure to account for SPADE formats here.
+                    return_string += f"<edu>" if is_hilda else f"<edu>" # TODO make sure to account for SPADE formats here.
+                    index += 1
+
                 else:
                     current_edu.append(file_str_arr[index])
                     cut_end += 1
@@ -115,11 +128,13 @@ def fuzzy_segment(fuzzy_system, file_str, settings, split=None, tile=None):
             # elif is_array:
             #     return_string.append(segment)
 
-            index += 1
+                    index += 1
         print ("HILDA EDUS & CUTS:", edu_list, cuts_list)
         return return_string + "</edu>\n", edu_list, cuts_list
 
 f_newline='\n'
+
+ 
 def start(input_data=None, settings={}, loop_breaker=None, fseg_to_matlab=None, split=None, tile=None):
     print(f"""\n\n{bcolors.OKGREEN + bcolors.BOLD}Welcome to FuzzySeg.
 
@@ -154,7 +169,7 @@ Beginning to process the inputs provided\n
         training_data = fseg_to_matlab(training_data)
     else:
         from mlflow_projects.fuzzy_segmentation.train import fseg_to_matlab as fs2matlab
-        training_data = fs2matlab(training_data)
+        # training_data = fs2matlab(training_data)
 
     fuzzy_system = eng.train(training_data, True)
     if 'output_data_path' in settings:
@@ -182,3 +197,12 @@ Beginning to process the inputs provided\n
         )
         print (output_edus)
     return {"edus":output_edus, "edus_list":edus_list, "cuts":output_cuts}, None
+
+
+    
+# start({"input":test_str}, settings={
+#     "root":"",
+#     "training_data_path":"../dependencies/phd_datasets/fuzzyseg_outputs/fis_training/generated/train_12_k3_syntax.dat",
+#     "parse_type": "syntax",
+#     "parser_output_form": "hilda"
+# }, fseg_to_matlab=None, split=None, tile=None)

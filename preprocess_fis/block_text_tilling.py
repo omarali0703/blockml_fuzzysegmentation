@@ -98,25 +98,30 @@ def calculate_boundary(eng, fis, int_coh_i, int_coh_j, ext_dis, left_stop):
     # print(
     #     f"fis: {fis}, INT_COH_I: {int_coh_i}, INT_COH_J: {int_coh_j}, EXT_DIS: {ext_dis}")
     # # eng.cd('/Users/omarali/Documents/mlflow_source/mlflow_projects/fuzzy_segmentation/train')
-    place_boundary = eng.fis(fis, int_coh_i, int_coh_j, ext_dis)
-    boundary = float(place_boundary) >= 0.6
+    stops = [',', '.', '?', "!"]
+    print (left_stop, left_stop == '.')
+    place_boundary = 1
+    if left_stop in stops:
+        boundary = True
+        print ("FUCK", left_stop)
+        return place_boundary, boundary
+    else:
+        place_boundary = eng.fis(fis, int_coh_i, int_coh_j, ext_dis)
+        boundary = float(place_boundary) >= 0.6
 
     # Left stop is the character that denotes a fullstop.
     # If this is a fullstop, then we force a boundary.
-    stops = [',', '.']
-    if left_stop in stops:
-        boundary = True
-
+    
     return place_boundary, boundary
 
 # True boundaries are a bin rep of the input data.
 # If provided then these are used if get_boundary is true.
 def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=None):
     print(f'{bcolors.OKCYAN}Begin tilling ...')
-
+# 100000000001000000000000000000000000000001000000000000000000000001000000000001
     boundaries = ''
     # print(len(string_arr))
-    print (tree_list, len(tree_list))
+    # print (tree_list, len(tree_list))
     string_arr_len = len(string_arr)
     boundary_objects = []
     for tree in tree_list:
@@ -135,7 +140,7 @@ def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=
                 # print("TEST", left_string_array, left_pad,
                 #   type(left_string_array), type(left_pad))
                 left_string_array = left_pad + left_string_array
-                print('2')
+                # print('2')
             right_pad = abs(k - len(right_string_array))
             # print (k, len(right_string_array))
             if right_pad > 0:
@@ -148,6 +153,7 @@ def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=
             #
             #                  ||||||||
             # AVG method below VVVVVVVV
+                
             left_internal_coh = internal_cohesion_AVG(
                 tree, 'inti', left_string_array, left=True)
             right_internal_coh = internal_cohesion_AVG(
@@ -157,13 +163,19 @@ def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=
             #        type(left_string_array), type(right_string_array)))
             external_dissim = compare_words_AVG(
                 tree, left_string_array + right_string_array, left=False)
-
             left_stop = left_string_array[-1]
             if get_boundary:
                 if not true_boundaries:
                     # print (left_string_array, right_string_array)
-                    boundary_score, is_boundary = calculate_boundary(
-                        eng, fis, left_internal_coh, right_internal_coh, external_dissim, left_stop[0])
+                    if left_string_array == [('NULL', ''), ('NULL', ''), ('NULL', '')]:
+                        boundary_score, is_boundary = 1, True
+                    
+                    elif right_string_array == [('NULL', ''), ('NULL', ''), ('NULL', '')]:
+                        boundary_score, is_boundary = 1, True
+                    else:
+                        boundary_score, is_boundary = calculate_boundary(
+                            eng, fis, left_internal_coh, right_internal_coh, external_dissim, left_stop[0])
+                    
                     if is_boundary:
                         boundaries += '1'
                     else:
@@ -173,7 +185,7 @@ def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=
                         boundary_score, is_boundary), "segi": left_string_array, "segj": right_string_array, "extdis": current_ext_set.copy(), "intcohi": current_inti_set.copy(), "intcohj": current_intj_set.copy()})
                 else:
                     # Get the boundaries from a bin rep of the training data.
-                    print(i, len(true_boundaries))
+                    # print(i, len(true_boundaries))
                     boundaries = true_boundaries[i]
                     # print(right_string_array)
                     output_to_file['steps'].append({"l_int": left_internal_coh, "r_int": right_internal_coh, "e_dis": external_dissim, "bound": (
@@ -187,7 +199,7 @@ def tile(eng, fis, tree_list, string_arr, k, get_boundary=True, true_boundaries=
                     (i, left_internal_coh, right_internal_coh, external_dissim))
 
     print(f'{bcolors.OKGREEN}Finished tilling process..... (So close :D!)')
-
+    
     if get_boundary:
         output_to_file['boundaries']['computed'] = boundaries
         if true_boundaries:

@@ -9,6 +9,7 @@ from python_micrologic import RSTSentiment_Parser as sentparser
 from sklearn import metrics
 from xml.etree.ElementTree import ParseError
 from run import start
+from mlflow import log_param
 
 class bcolors:
     HEADER = '\033[95m'
@@ -32,8 +33,9 @@ location = args[2]
 variables = args[3:7]
 number_of_docs_to_parse_index = 0
 error = ''
-try:
 
+try:
+    log_param("function", f"MICROLOGIC: {function_called}")
     list_path = os.listdir(location)
     print(variables)
     print(location)
@@ -226,9 +228,13 @@ try:
                         f'{bcolors.OKCYAN}Finished Processing part{block} of {filename}')
     elif function_called == functions[7]:
         file_counter = 0
-        limit = 10
+        limit = 20 
         l_counter = 0
+
         binary = True # Do a bin class.
+        log_param("class_type",f"{'binary' if binary else 'multiclass'}")
+        log_param("sentiments_requested", f"{limit}")
+
         for segfile in list_path:
         
             block_counter = 0
@@ -250,16 +256,21 @@ try:
                 sentiment_score_is_out_of = int(variables[0])
                 is_rst = variables[1] = True if variables[1] == "True" else False
                 is_inputted_edus = variables[2] = True if variables[2] == "True" else False
+                log_param("using_rst",f"{'RST' if is_rst else 'NO RST'}")
+                log_param("edus",f"{'FUZZYSEG' if is_inputted_edus else 'HILDA'}")
+
                 print ("RST? ", is_rst, ", EXT. EDU? ", is_inputted_edus)
                 files_preparsed = [] 
+                sentiment_data = sentparser.randomise_sentDS(sentiment_data, limit, 'overall', sentiment_score_is_out_of, charlimit=100)
                 if is_rst:
                     # Create a random array of sentiment data.
-                    sentiment_data = sentparser.randomise_sentDS(sentiment_data, limit, 'overall', sentiment_score_is_out_of, charlimit=100)
                     
                     # If we are going to input EDUs from generated/external source, in this case, FUZZYSEG.
-                    if is_inputted_edus:
                         # Go through sent data and produce EDUS.
-                        for review in sentiment_data:
+                    for review in sentiment_data:
+                        review['filename'] = f'input_{l_counter}.txt'
+
+                        if is_inputted_edus:
                             # This input object imitates our FlowML inputs (Which, for text, is {filename:filecontents, ...})
                             print ("reviewing text and producing Fuzzy EDUs...")
                             from train import fseg_to_matlab
@@ -286,12 +297,15 @@ try:
                             tmp_cut_sentiment_file.write(str(edu_data['cuts']))
                             review['edus'] = edu_data['edus']
                             # END OPTIONAL
-                            review['filename'] = f'input_{l_counter}.txt'
+                            # review['filename'] = f'input_{l_counter}.txt'
                             review['edu_filename'] = file_name
                             review['cuts_filename'] = cut_file_name
 
-                            files_preparsed.append(review)
-                            l_counter += 1
+                        files_preparsed.append(review)
+                        l_counter += 1
+                        
+
+                            
                     print (f"{bcolors.OKGREEN}Loading RST files into docker img...")
                     for review in files_preparsed:
                         file_name = review['filename']
@@ -310,7 +324,8 @@ try:
                     outputs, err = p.communicate()
                     # print (outputs)
                     print (f"{bcolors.OKGREEN}Image built. {outputs} {err} \n\nRunning parser...")
-
+                else:
+                    files_preparsed = sentiment_data
                 
                 l_counter = 0
                 pass # TODO pass RST files into docker img and build. Once built, return list of files that are inputs to HILDA. Run HILDA on these files and return RST trees.
@@ -320,7 +335,7 @@ try:
                         review_edus = review['edus']
                     if (binary):
                         print (review['overall'])
-                        review_reference_score = 1 if int(float(review['overall'])) > 2 else 0
+                        review_reference_score = 1 if int(float(review['overall'])) > 3 else 0
                     else:
                         review_reference_score = int(float(review['overall']))
 
@@ -332,12 +347,19 @@ try:
                             w=[]
                             # we need to open a tmp file so we can input its location into the HILDA wrapper. 
                             # This is a work around as i don't fancy updating the HILDa wrapper code and i'm lazy.
+                            print (f"{bcolors.OKBLUE}Generating RST trees...")
                             if is_inputted_edus:
-                                rst_tree = sentparser.get_rst_tree(review['filename'], review['edu_filename'])
+                                print (review)
+                                rst_tree = sentparser.get_rst_tree(review['filename'], review['edu_filename'], review['cuts_filename'])
+                                print (f"{bcolors.OKBLUE}FINISHED Generating RST trees...")
                             else:
                                 rst_tree = sentparser.get_rst_tree(review['filename'], )
+                                print (f"{bcolors.OKBLUE}FINISHED Generating RST trees...")
+                            
+                            chosen_rst_weights = sentparser.LIGHT
 
-                            sentparser.weight_RST(w, rst_tree)
+                            log_param("chosen_rst_weights", f"{chosen_rst_weights}")
+                            sentparser.weight_RST(weights=w, tup_obj=rst_tree, weighting_scheme=chosen_rst_weights)
                             # print (w)
                             computed = 0
                             tokens = 1
@@ -346,21 +368,35 @@ try:
                                 # TODO Make sure this is weighting properly
 
                                 text = weighted_edu[0]
-                                sent_score = sentparser.parse_sentence_LESK(text, 1, sentiment_score_is_out_of, weight, binary)
+                                sent_score = sentparser.parse_sentence_LESK(text, 1, sentiment_score_is_out_of if not binary else 1, weight, binary)
                                 # print (weight,sent_score )
-                                tokens += 1
+                                if sent_score > 0:
+                                    tokens += 1
                                 computed +=sent_score
                                 # computed *= weight
+                            output = computed/tokens
+                            
+                         
                             if binary:
+                                print ("BEFORE MAP: ", output)
+                                output = sentparser.map(output, -100, 100, 0, 1)
+                                print ("AFTER MAP: ", output)
+
                                 # output = 1 if sentparser.map(computed, -1, 1, 1, sentiment_score_is_out_of) > (sentiment_score_is_out_of//2) else 0
-                                output = sentparser.map(computed/tokens, 1, sentiment_score_is_out_of, 0, 1)
+                                # output = sentparser.map(computed/tokens, 0, sentiment_score_is_out_of, 0, 1)
                                 if output > 0.5:
                                     output = 1
                                 else:
                                     output = 0
                             else:
-                                output = int(sentparser.map(computed, -1, 1, 1, sentiment_score_is_out_of))
-                            print("COMP",computed, "COMPO", output)
+                                mid = 50
+                                sc = mid + output
+                                print ("BEFORE MAP & MID: ", sc)
+                                output = sentparser.map(sc, 0, 100, 0, sentiment_score_is_out_of)
+                                print ("AFTER MAP: ", output)
+
+                                output = int(round(output))
+                            print("COMP",computed, "COMPO", output, "TOKENS", tokens, computed/tokens)
 
                             # print ("SENTIMENT? ", output, computed)
                             l_counter += 1
@@ -368,24 +404,55 @@ try:
                         else:
                             print (f"{bcolors.OKGREEN}Finished parsing...")
                             
-                            computed = sentparser.parse_sentence_LESK(review_sentence, None, None, None, True)
-                            print (computed)
+                            computed = sentparser.parse_sentence_LESK(review_sentence, 1, sentiment_score_is_out_of if not binary else 1, 1, True)
+                            print ("COMPUTED", computed)
                             if computed == None:
                                 continue
                             l_counter += 1
-                            output = 1 if computed > 0 else 0
+                            # output = 1 if computed > 0 else 0
+
+                            if binary:
+                                output = sentparser.map(computed, -100, 100, 0, 1)
+                                if output > 0.5:
+                                    output = 1
+                                else:
+                                    output = 0
+                            else:
+                                mid = 50
+                                sc = mid + computed
+                                output = sentparser.map(sc, 0, 100, 0, sentiment_score_is_out_of)
+                                output = int(round(output))
+                                print ("NORMALISED: ", output)
 
                         y_true.append(review_reference_score)
                         y_pred.append(output)
                         print ("NEW LISTs: ", y_true, y_pred)
-                    except:
+                    except Exception as e:
+                        print (f"{bcolors.FAIL}Failed to generate RST tree. {e}")
                         l_counter += 1
                         continue
                             
                  
             file_counter += 1
-            print(metrics.confusion_matrix(y_true=y_true, y_pred=y_pred))
-            print(metrics.classification_report(y_true=y_true, y_pred=y_pred, digits=3))
+            log_param("sentiments_processed", f"{l_counter}")
+            log_param("y_true", f"{y_true}")
+            log_param("y_pred", f"{y_pred}")
+            cf = metrics.confusion_matrix(y_true=y_true, y_pred=y_pred)
+            cp = metrics.classification_report(y_true=y_true, y_pred=y_pred, digits=3, output_dict=True)
+            cp_macro = cp['macro avg']
+            cp_accuracy = cp['accuracy']
+            cp_mac_pre = cp_macro['precision']
+            cp_mac_rec = cp_macro['recall']
+            cp_mac_f1s = cp_macro['f1-score']
+            log_param("cp_mac_pre", f"{cp_mac_pre}")
+            log_param("cp_mac_rec", f"{cp_mac_rec}")
+            log_param("cp_mac_f1s", f"{cp_mac_f1s}")
+            log_param("cp_accuracy", f"{cp_accuracy}")
+            log_param("confusion_matrix", f"{cf}")
+
+            print (y_true, y_pred)
+            print(cf)
+            print(cp)
 
 
 except OSError as error:

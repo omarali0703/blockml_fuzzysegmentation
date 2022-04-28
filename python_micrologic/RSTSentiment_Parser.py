@@ -6,7 +6,7 @@ from nltk.corpus import wordnet as wn
 import nltk
 from nltk import word_tokenize, Tree
 from nltk.wsd import lesk
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, run
 import os
 import docker
 import random
@@ -64,8 +64,14 @@ def map(x, in_min, in_max, out_min, out_max):
  
 
 def str_2_usableobj(str_in):
+    print ('Converting to tuple...')
     str_in = str_in.replace('ParseTree', '')
+    print ("SHOWING TREE")
+    print (str_in, type(str_in))
+    print ("END SHOWING TREE")
     to_tup = eval(str_in)
+    print ('Converted.')
+
     return to_tup
 
 
@@ -73,6 +79,8 @@ import re
 
 w = []
 def weight_RST(weights, tup_obj, weight=1, weighting_scheme=LIGHT):
+    
+    print ("Begin Weighting Process....")
     NUC = '[N]'
     SAT = '[S]'
     
@@ -118,14 +126,17 @@ def weight_RST(weights, tup_obj, weight=1, weighting_scheme=LIGHT):
         if relation_type[0] == SAT:
             weight_RST(weights, subtree[0], weight*weighting_scheme[1])
             # weight_RST(weights, subtree[1], weight*weighting_scheme[1])
+    print ("FINISHED Weighting Process....")
 
         
-def get_rst_tree(input_dir, edu_dir, cuts_dir):
+def get_rst_tree(input_dir, edu_dir=None, cuts_dir=None):
     file_name = input_dir
-    input_dir = os.path.dirname(os.path.dirname(__file__))
+    root_dir = os.path.dirname(os.path.dirname(__file__))
     # input_dir = os.path.join(input_dir, '..')
-    input_dir = os.path.join(input_dir, f"dependencies/hilda-docker/{file_name}")
-    print (input_dir)
+    # input_dir = os.path.join(root_dir, f"dependencies/hilda-docker/{file_name}")
+    # edu_dir = os.path.join(root_dir, f"dependencies/hilda-docker/{edu_dir}")
+    # cuts_dir = os.path.join(root_dir, f"dependencies/hilda-docker/{cuts_dir}")
+    print (file_name, input_dir, edu_dir, cuts_dir)
    
     cmd = f"docker run -v /tmp:/tmp -ti hilda {file_name}";
     if edu_dir:
@@ -133,8 +144,11 @@ def get_rst_tree(input_dir, edu_dir, cuts_dir):
 
     p = Popen(cmd.split(), stdout=PIPE, shell=False)
     generated_tree, err = p.communicate()
+    p_status = p.wait()
+    
+    print ("FINISHED GENERATING FROM CMD LINE.")
+    print (generated_tree)
     generated_tree = generated_tree.decode('utf-8')
-    print(generated_tree, err)
     generated_tree = str_2_usableobj(generated_tree)
     return generated_tree
     # print (generated_tree.leaves())
@@ -203,13 +217,15 @@ def parse_sentence(sentence, rst=False):
 
 
 def parse_sentence_LESK(sentence, min_score, max_score, weight, binary=False):
-    
+    print ("LESKING INPUTS...")
     token = nltk.word_tokenize(sentence)
     after_tagging = nltk.pos_tag(token)
 
     sentiment_score = 0.0
     tokens_count = 0
     lemmatizer = WordNetLemmatizer()
+    positive_count, negative_count = 0, 0
+    pos_score, neg_score = 0, 0
     if sentence == "":
         return None
 
@@ -222,22 +238,49 @@ def parse_sentence_LESK(sentence, min_score, max_score, weight, binary=False):
         # print(swn_synset)
 
         sentiment = swn_synset.pos_score() - swn_synset.neg_score()
-        # sentiment = map(sentiment, -1, 1, 1, 5)
+        if swn_synset.pos_score() > 0:
+            pos_score += swn_synset.pos_score()
+            positive_count += 1
+
+        if swn_synset.pos_score() > 0:
+            neg_score += swn_synset.neg_score()
+            negative_count += 1
+        
+        sentiment = map(sentiment, -1, 1, min_score, max_score)
+
         sentiment_score += sentiment
         # sentiment = int(sentiment)
         tokens_count += 1
     
-    if not binary:
-        sentiment = (sentiment_score/tokens_count) * weight
-        sentiment = map(sentiment, -tokens_count, tokens_count, min_score, max_score)
-    else:
+    if negative_count == 0:
+        negative_count = 1
+    if positive_count == 0:
+        positive_count = 1
+
+    negative_count = (neg_score/negative_count)*100
+    positive_count = (pos_score/positive_count)*100
+    
+    print ("NEG %: ", negative_count, "POS %:", positive_count, "Weighted NEG %: ", negative_count*weight, "Weighted POS %:", positive_count*weight, weight)
+    
+    weighted_positive = positive_count * weight
+    weighted_negative = negative_count * weight
+
+    # sentiment = (sentiment_score/tokens_count) * weight
+    # sentiment = (weighted_positive + weighted_negative) / 2
+    sentiment = (weighted_positive - weighted_negative)
+    # if not binary:
+
+        # sentiment = map(sentiment, -tokens_count, tokens_count, min_score, max_score)
+    # else:
+        # sentiment_score = map(sentiment_score, -1, 1, 0, 1)
         # sentiment = (sentiment_score/tokens_count)
         # print (sentiment)
         # sentiment = map(sentiment, -tokens_count, tokens_count, 0, 1)
-        sentiment = map(sentiment, -tokens_count, tokens_count, min_score, max_score)
+        # sentiment = map(sentiment, -tokens_count, tokens_count, min_score, max_score)
 
         # print (sentiment)
 
+    print ("RETUNING SENTIMENT INPUTS...")
 
     return sentiment
         # if sentiment > 0.2:

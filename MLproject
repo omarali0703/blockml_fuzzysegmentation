@@ -1,0 +1,21 @@
+name: Fuzzy Segmentation
+
+# conda_env: my_env.yaml
+# Can have a docker_env instead of a conda_env, e.g.
+# docker_env:
+#    image:  mlflow-docker-example
+
+entry_points:
+  sentimentcasestudy:
+    parameters:
+      data_file: path
+      rankings_outof: {type: int, default: 5}
+      fuzzy_segmentations: {type: boolean, default: False}
+      is_rst: {type: boolean, default: False}
+    command: "python micro_logic.py sentimentcasestudy {data_file} {rankings_outof} {is_rst} {fuzzy_segmentations}"
+  # validate:
+  #   parameters:
+  #     data_file: path
+  #   command: "python validate.py {data_file}"
+  # mlflow run PhD  -e sentimentcasestudy -P data_file="dependencies/phd_datasets/sentiment_data"
+  

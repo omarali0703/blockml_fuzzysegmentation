@@ -1,0 +1,5 @@
+artifact_location: file:///Users/omarali/Documents/mlflow_source/mlflow_projects/fuzzy_segmentation/mlruns/0
+experiment_id: '0'
+lifecycle_stage: active
+name: FuzzySeg
+tags: {}

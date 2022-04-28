@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/omarali/Documents/mlflow_source/mlflow_projects/fuzzy_segmentation/mlruns/0/4d3e06c097ca41e28c64bd22fd274787/artifacts
+end_time: 1650652348622
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 4d3e06c097ca41e28c64bd22fd274787
+run_uuid: 4d3e06c097ca41e28c64bd22fd274787
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1650652092921
+status: 3
+tags: []
+user_id: omarali
