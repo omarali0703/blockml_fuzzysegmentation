@@ -1,4 +1,8 @@
-# MLFlow Example Project Structure
+# Fuzzy Segmentation Source Code
+This project relies on the BlockML framework also developed by myself, to work.
+Fuzzy Segmentation is a segmentation model that utilises fuzzy systems and syntax parsing to segment text in a manner of different ways. My PhD project mainly concerns text segmentation with RST (Rhetorical structure Theory) however, the fuzzy system can be trained to segment in accordance with other patterns.
+
+# BlockML Example Project Structure
 1. each folder defines a particular block the interface will run through
     2. each block can contain sub-blocks, modules etc that will run in the order of your choosing -> Defined in the **__init__** file of the respective block.
     
